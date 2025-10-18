@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SBAR - Passagem de Cuidados</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+      background-color: #f4f4f4;
+    }
+    h1, h2 {
+      color: #2c3e50;
+    }
+    textarea, input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      resize: vertical;
+    }
+    label {
+      font-weight: bold;
+    }
+    .section {
+      background-color: #ffffff;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #2980b9;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>SBAR - Passagem de Cuidados Cirúrgicos para UTI</h1>
+
+  <div class="section">
+    <h2>S - Situação</h2>
+    <label>Identificação do paciente:</label>
+    <textarea placeholder="Nome, idade, sexo, procedimento, anestesia, status atual..."></textarea>
+
+    <label>Sinais vitais:</label>
+    <textarea placeholder="PA, FC, FR, SpO₂, T"></textarea>
+  </div>
+
+  <div class="section">
+    <h2>B - Background (Histórico)</h2>
+    <textarea placeholder="Comorbidades, diagnóstico, eventos intraoperatórios, medicações utilizadas..."></textarea>
+  </div>
+
+  <div class="section">
+    <h2>A - Avaliação</h2>
+    <textarea placeholder="Estado neurológico, hemodinâmico, respiratório, dispositivos em uso..."></textarea>
+  </div>
+
+  <div class="section">
+    <h2>R - Recomendação</h2>
+    <textarea placeholder="Condutas esperadas na UTI, exames, monitorizações, extubação planejada..."></textarea>
+  </div>
+
+  <div class="section">
+    <h2>Checklist de Dispositivos</h2>
+    <label><input type="checkbox"> Entubado</label><br>
+    <label><input type="checkbox"> Ventilação mecânica</label><br>
+    <label><input type="checkbox"> SVD</label><br>
+    <label><input type="checkbox"> Dreno cirúrgico</label><br>
+    <label><input type="checkbox"> Acesso central</label><br>
+    <label><input type="checkbox"> Acesso arterial</label><br>
+    <label><input type="checkbox"> Drogas vasoativas</label><br>
+    <label><input type="checkbox"> Nutrição enteral</label><br>
+  </div>
+
+  <button onclick="window.print()">Imprimir / Salvar como PDF</button>
+</body>
+</html>
