@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SBAR - Passagem de Cuidados</title>
+  <title>SBAR Automatizado - Passagem de Cuidados</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -15,24 +15,18 @@
     h1, h2 {
       color: #2c3e50;
     }
-    textarea, input {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      resize: vertical;
-    }
     label {
       font-weight: bold;
+      display: block;
+      margin-top: 15px;
     }
-    .section {
-      background-color: #ffffff;
-      padding: 15px;
-      margin-bottom: 20px;
-      border-radius: 8px;
-      box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
     }
     button {
       padding: 10px 20px;
@@ -41,48 +35,161 @@
       border: none;
       border-radius: 5px;
       font-size: 16px;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+    #resultado {
+      white-space: pre-wrap;
+      background-color: #fff;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 20px;
+      border: 1px solid #ccc;
     }
   </style>
 </head>
 <body>
-  <h1>SBAR - Passagem de Cuidados Cirúrgicos para UTI</h1>
+  <h1>SBAR Automatizado - Passagem de Cuidados Cirúrgicos</h1>
 
-  <div class="section">
-    <h2>S - Situação</h2>
-    <label>Identificação do paciente:</label>
-    <textarea placeholder="Nome, idade, sexo, procedimento, anestesia, status atual..."></textarea>
+  <h2>Subjetivo (Situação)</h2>
+  <label>Nome do paciente:</label>
+  <input type="text" id="nome">
 
-    <label>Sinais vitais:</label>
-    <textarea placeholder="PA, FC, FR, SpO₂, T"></textarea>
-  </div>
+  <label>Idade:</label>
+  <input type="number" id="idade">
 
-  <div class="section">
-    <h2>B - Background (Histórico)</h2>
-    <textarea placeholder="Comorbidades, diagnóstico, eventos intraoperatórios, medicações utilizadas..."></textarea>
-  </div>
+  <label>Sexo:</label>
+  <select id="sexo">
+    <option>Masculino</option>
+    <option>Feminino</option>
+  </select>
 
-  <div class="section">
-    <h2>A - Avaliação</h2>
-    <textarea placeholder="Estado neurológico, hemodinâmico, respiratório, dispositivos em uso..."></textarea>
-  </div>
+  <label>Procedimento cirúrgico:</label>
+  <input type="text" id="procedimento">
 
-  <div class="section">
-    <h2>R - Recomendação</h2>
-    <textarea placeholder="Condutas esperadas na UTI, exames, monitorizações, extubação planejada..."></textarea>
-  </div>
+  <label>Tipo de anestesia:</label>
+  <select id="anestesia">
+    <option>Geral</option>
+    <option>Balanceada</option>
+    <option>Venosa Total (TIVA)</option>
+    <option>Raquidiana</option>
+    <option>Peridural</option>
+    <option>Bloqueio regional</option>
+  </select>
 
-  <div class="section">
-    <h2>Checklist de Dispositivos</h2>
-    <label><input type="checkbox"> Entubado</label><br>
-    <label><input type="checkbox"> Ventilação mecânica</label><br>
-    <label><input type="checkbox"> SVD</label><br>
-    <label><input type="checkbox"> Dreno cirúrgico</label><br>
-    <label><input type="checkbox"> Acesso central</label><br>
-    <label><input type="checkbox"> Acesso arterial</label><br>
-    <label><input type="checkbox"> Drogas vasoativas</label><br>
-    <label><input type="checkbox"> Nutrição enteral</label><br>
-  </div>
+  <label>Horário de término da cirurgia:</label>
+  <input type="time" id="hora">
 
-  <button onclick="window.print()">Imprimir / Salvar como PDF</button>
+  <label>Sinais vitais:</label>
+  <input type="text" id="sinais" placeholder="Ex: PA 120/80, FC 85, FR 16, SpO₂ 98%">
+
+  <h2>Background (Histórico)</h2>
+  <label>Comorbidades relevantes:</label>
+  <textarea id="comorbidades" placeholder="Ex: HAS, DM2, DPOC..."></textarea>
+
+  <label>Resumo da anestesia/cirurgia:</label>
+  <textarea id="resumo" placeholder="Eventos intraoperatórios, estabilidade, medicações usadas..."></textarea>
+
+  <h2>Avaliação</h2>
+  <label>Estado neurológico (Glasgow / RASS):</label>
+  <input type="text" id="neurologico">
+
+  <label>Respiração:</label>
+  <input type="text" id="respiracao" placeholder="Ex: Entubado em VM, FiO₂ 40%">
+
+  <label>Hemodinâmica:</label>
+  <input type="text" id="hemodinamica" placeholder="Ex: Noradrenalina 0,05 mcg/kg/min">
+
+  <label>Diurese e hidratação:</label>
+  <input type="text" id="diurese" placeholder="Ex: Diurese preservada, balanço hídrico +500ml">
+
+  <h2>Recomendação</h2>
+  <textarea id="recomendacao" placeholder="Condutas esperadas na UTI, exames pendentes, plano de extubação, etc."></textarea>
+
+  <br><br>
+  <button onclick="gerarSBAR()">Gerar Relatório</button>
+  <button onclick="copiarTexto()">Copiar Relatório</button>
+  <button onclick="gerarPDF()">Gerar PDF</button>
+
+  <h2>📝 Relatório Gerado</h2>
+  <div id="resultado"></div>
+
+  <!-- Bibliotecas para gerar PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script>
+    let textoGerado = "";
+
+    function gerarSBAR() {
+      const nome = document.getElementById("nome").value;
+      const idade = document.getElementById("idade").value;
+      const sexo = document.getElementById("sexo").value;
+      const procedimento = document.getElementById("procedimento").value;
+      const anestesia = document.getElementById("anestesia").value;
+      const hora = document.getElementById("hora").value;
+      const sinais = document.getElementById("sinais").value;
+      const comorbidades = document.getElementById("comorbidades").value;
+      const resumo = document.getElementById("resumo").value;
+      const neurologico = document.getElementById("neurologico").value;
+      const respiracao = document.getElementById("respiracao").value;
+      const hemodinamica = document.getElementById("hemodinamica").value;
+      const diurese = document.getElementById("diurese").value;
+      const recomendacao = document.getElementById("recomendacao").value;
+
+      textoGerado = `🩺 SBAR – Passagem de Cuidados Cirúrgicos para UTI
+
+🔹 SITUAÇÃO
+Paciente ${nome}, ${idade} anos, ${sexo}, submetido a ${procedimento} sob anestesia ${anestesia}. Cirurgia finalizada às ${hora}. Sinais vitais atuais: ${sinais}.
+
+🔹 BACKGROUND
+Comorbidades: ${comorbidades}.
+Resumo da cirurgia/anestesia: ${resumo}.
+
+🔹 AVALIAÇÃO
+Estado neurológico: ${neurologico}.
+Respiração: ${respiracao}.
+Hemodinâmica: ${hemodinamica}.
+Hidratação e diurese: ${diurese}.
+
+🔹 RECOMENDAÇÕES
+${recomendacao}
+
+---
+
+✅ Relatório gerado automaticamente para registro clínico.`;
+
+      document.getElementById("resultado").textContent = textoGerado;
+    }
+
+    function copiarTexto() {
+      if (!textoGerado) return alert("Gere o relatório primeiro.");
+      navigator.clipboard.writeText(textoGerado)
+        .then(() => alert("Relatório copiado para a área de transferência!"))
+        .catch(() => alert("Erro ao copiar. Tente manualmente."));
+    }
+
+    async function gerarPDF() {
+      if (!textoGerado) return alert("Gere o relatório primeiro.");
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const linhas = textoGerado.split('\n');
+      let y = 10;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(12);
+
+      linhas.forEach(linha => {
+        if (y > 280) {
+          doc.addPage();
+          y = 10;
+        }
+        doc.text(linha, 10, y);
+        y += 8;
+      });
+
+      doc.save("relatorio-sbar.pdf");
+    }
+  </script>
 </body>
 </html>
