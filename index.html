@@ -62,22 +62,10 @@
 <input type="number" id="idade" placeholder="Ex: 42" />
 
 <label>Motivo da internação:</label>
-<select id="motivo">
-  <option>Choque séptico por colecistite aguda</option>
-  <option>Sepse pulmonar</option>
-  <option>Trauma abdominal</option>
-  <option>Insuficiência respiratória</option>
-  <option>Outros</option>
-</select>
+<input type="text" id="motivo" placeholder="Ex: Abdome agudo, trauma torácico, TCE,..." />
 
 <label>Procedimento realizado:</label>
-<select id="procedimento">
-  <option>Laparotomia exploradora</option>
-  <option>Colectomia</option>
-  <option>Toracotomia</option>
-  <option>Videolaparoscopia</option>
-  <option>Outro</option>
-</select>
+<input type="text" id="procedimento" placeholder="Laparotomia exploradora, Apendicectomia,..." />
 
 <label>Urgência do procedimento:</label>
 <select id="urgencia">
@@ -92,10 +80,11 @@
 <label>Comorbidades (marque as que se aplicam):</label>
 <select id="comorbidades" multiple>
   <option value="hipertenso">Hipertensão</option>
-  <option value="diabético">Diabetes</option>
+  <option value="DMNI">Diabetes não insulinodependente</option>
+  <option value="DMI">Diabetes insulinodependente</option>
   <option value="doença arterial coronariana">Doença Arterial Coronariana</option>
   <option value="DPOC">DPOC</option>
-  <option value="IRC">Insuficiência Renal Crônica</option>
+  <option value="IRC">Doença Renal Crônica</option>
   <option value="outros">Outros</option>
 </select>
 
@@ -113,7 +102,7 @@
 <select id="anestesia">
   <option>Geral balanceada</option>
   <option>Geral venosa total (TIVA)</option>
-  <option>Raquidiana</option>
+  <option>Raquianestesia</option>
   <option>Peridural</option>
   <option>Outros</option>
 </select>
@@ -123,9 +112,9 @@
 
 <label>Via aérea:</label>
 <select id="viaAerea">
-  <option>Fácil, Cormack-Lehane I</option>
-  <option>Média, Cormack II</option>
-  <option>Difícil, Cormack III-IV</option>
+  <option>Cormack-Lehane I</option>
+  <option>Cormack-Lehane II</option>
+  <option>Cormack-Lehane III-IV</option>
 </select>
 
 <label>Hemodinâmica:</label>
@@ -153,6 +142,7 @@
   <option value="Dreno cirúrgico">Dreno cirúrgico</option>
   <option value="TOT">Tubo orotraqueal</option>
   <option value="SVD">SVD</option>
+  <option value="OutrosDispositivos">Outros</option>
 </select>
 
 
@@ -163,7 +153,6 @@
 <select id="transporte">
   <option>Monitorização contínua</option>
   <option>Monitorização e uso de drogas vasoativas</option>
-  <option>Sem intercorrências</option>
 </select>
 
 <label>Sedação:</label>
