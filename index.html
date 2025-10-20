@@ -1,447 +1,211 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SBAR Automatizado - UTI</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f7f7f7;
-      padding: 20px;
-      max-width: 900px;
-      margin: auto;
-    }
-    h1, h2 {
-      color: #2c3e50;
-    }
-    label {
-      font-weight: bold;
-      margin-top: 10px;
-      display: block;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 12px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    textarea {
-      resize: vertical;
-    }
-    button {
-      background-color: #2980b9;
-      color: white;
-      padding: 10px 20px;
-      margin: 10px 10px 0 0;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    #resultado {
-      white-space: pre-wrap;
-      background-color: #fff;
-      padding: 15px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      margin-top: 20px;
-    }
-    #utiCampos {
-      display: none;
-      margin-left: 15px;
-      border-left: 3px solid #2980b9;
-      padding-left: 10px;
-      margin-bottom: 12px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SBAR Automatizado - UTI</title>
+<style>
+ body {
+   font-family: Arial, sans-serif;
+   background: #f7f7f7;
+   padding: 20px;
+   max-width: 900px;
+   margin: auto;
+ }
+ label {font-weight: bold; display:block; margin-top:10px;}
+ input, select {width: 100%; padding:8px; border-radius:5px; border:1px solid #ccc; margin-bottom:10px;}
+ #utiCampos, #viaAereaDetalhada {display:none; margin-left:15px; border-left:3px solid #2980b9; padding-left:10px;}
+ #resultado {background:#fff;border:1px solid #ccc; padding:15px; white-space:pre-wrap; border-radius:5px; margin-top:20px;}
+</style>
 </head>
 <body>
 
 <h1>SBAR Automatizado - Passagem para UTI</h1>
 
-<h2>🟢 Situação</h2>
-
 <label>Nome do paciente:</label>
-<input type="text" id="nome" placeholder="Ex: Pedro" />
+<input type="text" id="nome">
 
 <label>Idade:</label>
-<input type="number" id="idade" placeholder="Ex: 42" />
+<input type="number" id="idade">
 
 <label>Sexo:</label>
 <select id="sexo">
-  <option value="">Selecione</option>
-  <option value="masculino">Masculino</option>
-  <option value="feminino">Feminino</option>
+ <option value="">Selecione</option>
+ <option value="masculino">Masculino</option>
+ <option value="feminino">Feminino</option>
 </select>
+
+<label>Motivo da internação:</label>
+<input type="text" id="motivo">
 
 <label>Origem do paciente:</label>
 <select id="origem" onchange="toggleUTICampos()">
-  <option value="">Selecione</option>
-  <option value="emergencia">Setor de Emergência</option>
-  <option value="enfermaria">Enfermaria</option>
-  <option value="uti">UTI</option>
+ <option value="">Selecione</option>
+ <option value="emergência">Emergência</option>
+ <option value="enfermaria">Enfermaria</option>
+ <option value="uti">UTI</option>
 </select>
 
 <div id="utiCampos">
-  <label>Pacientes vindo da UTI:</label>
+ <label>Está intubado?</label>
+ <select id="intubado" onchange="toggleViaAereaDetalhada()">
+   <option value="">Selecione</option>
+   <option value="Sim">Sim</option>
+   <option value="Não">Não</option>
+ </select>
 
-  <label>Está intubado?</label>
-  <select id="intubado">
-    <option value="">Selecione</option>
-    <option value="Sim">Sim</option>
-    <option value="Não">Não</option>
-  </select>
+ <label>Tipo de ventilação:</label>
+ <select id="tipoVentilacao">
+   <option value="">Selecione</option>
+   <option>VM</option>
+   <option>Ar ambiente</option>
+   <option>O2 suplementar</option>
+   <option>Traqueostomia</option>
+ </select>
 
-  <label>Tipo de ventilação:</label>
-  <select id="tipoVentilacao">
-    <option value="">Selecione</option>
-    <option value="Ventilação mecânica">Ventilação mecânica</option>
-    <option value="Ar ambiente">Ar ambiente</option>
-    <option value="Oxigênio suplementar">Oxigênio suplementar</option>
-    <option value="Traqueostomia">Traqueostomia</option>
-  </select>
+ <label>Drogas vasoativas:</label>
+ <select id="drogas" multiple>
+   <option value="noradrenalina">Noradrenalina</option>
+   <option value="vasopressina">Vasopressina</option>
+   <option value="dobutamina">Dobutamina</option>
+   <option value="nitroprussiato">Nitroprussiato</option>
+   <option value="nitroglicerina">Nitroglicerina</option>
+   <option value="outros">Outros</option>
+ </select>
 
-  <label>Drogas vasoativas em uso (marque as que se aplicam):</label>
-  <select id="drogasVasoativas" multiple>
-    <option value="Noradrenalina">Noradrenalina</option>
-    <option value="Vasopressina">Vasopressina</option>
-    <option value="Dobutamina">Dobutamina</option>
-    <option value="Nitroprussiato">Nitroprussiato</option>
-    <option value="Nitroglicerina">Nitroglicerina</option>
-    <option value="Outros">Outros</option>
-  </select>
+ <label>Outras drogas:</label>
+ <input type="text" id="outrasDrogas">
 
-  <label>Se marcou "Outros", especifique:</label>
-  <input type="text" id="drogasOutros" placeholder="Descreva outras drogas vasoativas" />
+ <label>Sedação:</label>
+ <select id="sedacaoUTI">
+   <option value="">Selecione</option>
+   <option>Plano profundo</option>
+   <option>Consciente</option>
+ </select>
 
-  <label>Sedação:</label>
-  <select id="sedacaoUTI">
-    <option value="">Selecione</option>
-    <option value="Plano profundo">Plano profundo</option>
-    <option value="Consciente">Consciente</option>
-  </select>
+ <label>Monitorizado?</label>
+ <select id="monitorizado">
+   <option value="">Selecione</option>
+   <option>Sim</option>
+   <option>Não</option>
+ </select>
 
-  <label>Veio monitorizado?</label>
-  <select id="monitorizado">
-    <option value="">Selecione</option>
-    <option value="Sim">Sim</option>
-    <option value="Não">Não</option>
-  </select>
+ <div id="viaAereaDetalhada">
+   <h4>Detalhes da via aérea</h4>
+   <label>Sequência:</label>
+   <select id="sequencia">
+     <option>Rápida</option><option>Lenta</option><option>Atrasada</option>
+   </select>
+   <label>Número do tubo:</label><input id="numTubo">
+   <label>Aramado?</label><select id="aramado"><option>Sim</option><option>Não</option></select>
+   <label>Dispositivo:</label>
+   <select id="dispositivo"> 
+     <option>Laringoscópio</option>
+     <option>Videolaringoscópio</option>
+     <option>Fibroscópio</option>
+   </select>
+   <label>Cormack:</label><input id="cormack">
+   <label>Bougie?</label><select id="bougie"><option>Sim</option><option>Não</option></select>
+   <label>Intercorrências:</label><input id="intercorrenciasViaAerea" placeholder="Ex: nenhuma">
+ </div>
 </div>
 
-<label>Motivo da internação:</label>
-<input type="text" id="motivo" placeholder="Ex: Abdome agudo, trauma torácico, TCE,..." />
-
 <label>Procedimento realizado:</label>
-<input type="text" id="procedimento" placeholder="Laparotomia exploradora, Apendicectomia,..." />
+<input id="procedimento">
 
 <label>Urgência do procedimento:</label>
 <select id="urgencia">
-  <option>Emergência</option>
-  <option>Urgência</option>
-  <option>Eletivo</option>
+ <option>Emergência</option>
+ <option>Urgência</option>
+ <option>Eletivo</option>
 </select>
 
-<!-- 🔷 Background -->
-<h2>🔷 Background</h2>
+<h3>🔷 Background</h3>
 
-<label>Peso do paciente (kg):</label>
-<input type="number" id="peso" placeholder="Ex: 70" />
+<label>Peso (kg):</label><input id="peso" type="number">
+<label>Altura (cm):</label><input id="altura" type="number">
+<label>Alergias:</label><input id="alergias">
 
-<label>Altura (cm):</label>
-<input type="number" id="altura" placeholder="Ex: 175" />
+<button onclick="gerar()">Gerar Relatório</button>
 
-<label>Alergias:</label>
-<input type="text" id="alergias" placeholder="Ex: Penicilina, Sulfa..." />
-
-<label>Comorbidades (marque as que se aplicam):</label>
-<select id="comorbidades" multiple>
-  <option value="hipertenso">Hipertensão</option>
-  <option value="diabetes não insulinodependente">Diabetes não insulinodependente</option>
-  <option value="diabetes insulinodependente">Diabetes insulinodependente</option>
-  <option value="doença arterial coronariana">Doença Arterial Coronariana</option>
-  <option value="DPOC">DPOC</option>
-  <option value="IRC">Doença Renal Crônica</option>
-  <option value="outros">Outros</option>
-</select>
-
-<label>Cirurgias prévias:</label>
-<input type="text" id="cirurgias" placeholder="Ex: Revascularização do miocárdio" />
-
-<label>Medicações em uso:</label>
-<input type="text" id="medicacoes" placeholder="Ex: Losartana, Metformina, AAS..." />
-
-
-<!-- 🟠 Avaliação -->
-<h2>🟠 Avaliação</h2>
-
-<label>Tipo de anestesia:</label>
-<select id="anestesia">
-  <option>Geral balanceada</option>
-  <option>Geral venosa total (TIVA)</option>
-  <option>Raquianestesia</option>
-  <option>Peridural</option>
-  <option>Outros</option>
-</select>
-
-<label>Indução anestésica:</label>
-<input type="text" id="induçao" placeholder="Ex: Sequência rápida, sem intercorrências" />
-
-<label>Via aérea:</label>
-<select id="viaAerea">
-  <option>Cormack-Lehane I</option>
-  <option>Cormack-Lehane II</option>
-  <option>Cormack-Lehane III-IV</option>
-</select>
-
-<label>Hemodinâmica:</label>
-<input type="text" id="hemodinamica" placeholder="Ex: Noradrenalina 0,2 mcg/kg/min" />
-
-<label>Respiração:</label>
-<input type="text" id="respiracao" placeholder="Ex: Ventilação mecânica durante transoperatório" />
-
-<label>Renal:</label>
-<input type="text" id="renal" placeholder="Ex: 2500ml de cristaloide, 500ml de diurese" />
-
-<label>Infeccioso:</label>
-<input type="text" id="infeccao" placeholder="Ex: Febre intraoperatória, Ceftriaxona 13:00" />
-
-<label>Hematológico:</label>
-<input type="text" id="hemato" placeholder="Ex: 1 concentrado de hemácias" />
-
-<label>Endócrino:</label>
-<input type="text" id="endocrino" placeholder="Ex: Euglicêmico" />
-
-<label>Dispositivos (marque os presentes):</label>
-<select id="dispositivos" multiple>
-  <option value="CVC">CVC</option>
-  <option value="Acesso periférico">Acesso periférico</option>
-  <option value="Dreno cirúrgico">Dreno cirúrgico</option>
-  <option value="TOT">Tubo orotraqueal</option>
-  <option value="SVD">SVD</option>
-  <option value="AVP">AVP</option>
-</select>
-
-
-<!-- 🔴 Recomendação -->
-<h2>🔴 Recomendação</h2>
-
-<label>Transporte:</label>
-<select id="transporte">
-  <option>Monitorização contínua</option>
-  <option>Monitorização e uso de drogas vasoativas</option>
-</select>
-
-<label>Sedação:</label>
-<select id="sedacao">
-  <option>Sedado</option>
-  <option>Despertando</option>
-  <option>Acordado</option>
-</select>
-
-<label>Ventilação:</label>
-<select id="ventilacao">
-  <option>Em ventilação mecânica</option>
-  <option>Espontaneamente</option>
-</select>
-
-<label>Intercorrências durante transporte:</label>
-<input type="text" id="intercorrencias" placeholder="Ex: Nenhuma" />
-
-
-<!-- ✅ Botões -->
-<br>
-<button onclick="gerarSBAR()">Gerar Relatório</button>
-<button onclick="copiarTexto()">Copiar Relatório</button>
-<button onclick="gerarPDF()">Gerar PDF</button>
-
-<!-- 📜 Resultado -->
-<h2>📝 Relatório Gerado</h2>
+<h3>📝 Relatório</h3>
 <div id="resultado"></div>
 
-<!-- 📜 Scripts -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-  let textoGerado = "";
+function toggleUTICampos(){
+ const o=document.getElementById("origem").value;
+ document.getElementById("utiCampos").style.display=o==="uti"?"block":"none";
+ if(o!=="uti") document.getElementById("viaAereaDetalhada").style.display="none";
+}
+function toggleViaAereaDetalhada(){
+ const i=document.getElementById("intubado").value;
+ document.getElementById("viaAereaDetalhada").style.display=i==="Não"?"block":"none";
+}
+function calcPI(altura,sexo){
+ if(!altura||!sexo) return 0;
+ return sexo==="masculino"?52+0.75*(altura-152):49+0.67*(altura-152);
+}
+function gerar(){
+ const n=document.getElementById("nome").value;
+ const i=document.getElementById("idade").value;
+ const s=document.getElementById("sexo").value;
+ const m=document.getElementById("motivo").value;
+ const o=document.getElementById("origem").value;
+ const p=document.getElementById("procedimento").value;
+ const u=document.getElementById("urgencia").value;
+ const peso=parseFloat(document.getElementById("peso").value);
+ const altura=parseFloat(document.getElementById("altura").value);
+ const pi=calcPI(altura,s);
+ const pa=peso+0.4*(peso-pi);
+ const alerg=document.getElementById("alergias").value;
+ let situacaoText=`Paciente ${n}, ${i} anos, ${s}. ${m ? `Apresenta quadro de ${m.toLowerCase()}.` : ""}\n`;
+ // Origem narrativa
+ if(o==="uti"){
+   const int=document.getElementById("intubado").value;
+   const vent=document.getElementById("tipoVentilacao").value;
+   const drogas=Array.from(document.getElementById("drogas").selectedOptions).map(x=>x.value);
+   const outras=document.getElementById("outrasDrogas").value;
+   const sed=document.getElementById("sedacaoUTI").value;
+   const mon=document.getElementById("monitorizado").value;
 
-  function toggleUTICampos() {
-    const origem = document.getElementById("origem").value;
-    const utiCampos = document.getElementById("utiCampos");
-    if (origem === "uti") {
-      utiCampos.style.display = "block";
-    } else {
-      utiCampos.style.display = "none";
-      // Limpa campos uti ao esconder
-      document.getElementById("intubado").value = "";
-      document.getElementById("tipoVentilacao").value = "";
-      document.getElementById("drogasVasoativas").selectedIndex = -1;
-      document.getElementById("drogasOutros").value = "";
-      document.getElementById("sedacaoUTI").value = "";
-      document.getElementById("monitorizado").value = "";
-    }
-  }
+   let textoUTI="Vem da UTI";
+   if(int==="Sim") textoUTI+=` em IOT + ${vent}`;
+   else textoUTI+=` não intubado, com ${vent}`;
+   if(sed) textoUTI+=`, sedado em ${sed}`;
+   if(mon==="Sim") textoUTI+=`, monitorizado`;
 
-  function calcularPesoIdeal(altura, sexo) {
-    if (sexo === 'masculino') {
-      return 52 + 0.75 * (altura - 152);
-    } else if (sexo === 'feminino') {
-      return 49 + 0.67 * (altura - 152);
-    } else {
-      return 0;
-    }
-  }
-
-  function calcularPesoAjustado(peso, pesoIdeal) {
-    return peso + 0.4 * (peso - pesoIdeal);
-  }
-
-  function gerarSBAR() {
-    const nome = document.getElementById("nome").value;
-    const idade = document.getElementById("idade").value;
-    const sexo = document.getElementById("sexo").value;
-    const origem = document.getElementById("origem").value;
-
-    const motivo = document.getElementById("motivo").value;
-    const procedimento = document.getElementById("procedimento").value;
-    const urgencia = document.getElementById("urgencia").value;
-
-    const comorbidades = Array.from(document.getElementById("comorbidades").selectedOptions).map(o => o.value).join(", ");
-    const cirurgias = document.getElementById("cirurgias").value;
-    const medicacoes = document.getElementById("medicacoes").value;
-
-    const anestesia = document.getElementById("anestesia").value;
-    const induçao = document.getElementById("induçao").value;
-    const viaAerea = document.getElementById("viaAerea").value;
-    const hemodinamica = document.getElementById("hemodinamica").value;
-    const respiracao = document.getElementById("respiracao").value;
-    const renal = document.getElementById("renal").value;
-    const infeccao = document.getElementById("infeccao").value;
-    const hemato = document.getElementById("hemato").value;
-    const endocrino = document.getElementById("endocrino").value;
-    const dispositivos = Array.from(document.getElementById("dispositivos").selectedOptions).map(o => o.value).join(", ");
-
-    const transporte = document.getElementById("transporte").value;
-    const sedacao = document.getElementById("sedacao").value;
-    const ventilacao = document.getElementById("ventilacao").value;
-    const intercorrencias = document.getElementById("intercorrencias").value;
-
-    const pesoPaciente = parseFloat(document.getElementById("peso").value);
-    const alturaPaciente = parseFloat(document.getElementById("altura").value);
-    const alergias = document.getElementById("alergias").value;
-
-    let pesoIdeal = calcularPesoIdeal(alturaPaciente, sexo);
-    let pesoAjustado = calcularPesoAjustado(pesoPaciente, pesoIdeal);
-
-    // Captura dados UTI
-    let infoUTI = "";
-    if (origem === "uti") {
-      const intubado = document.getElementById("intubado").value;
-      const tipoVentilacao = document.getElementById("tipoVentilacao").value;
-      const drogasVasoativas = Array.from(document.getElementById("drogasVasoativas").selectedOptions).map(o => o.value);
-      const drogasOutros = document.getElementById("drogasOutros").value.trim();
-      const sedacaoUTI = document.getElementById("sedacaoUTI").value;
-      const monitorizado = document.getElementById("monitorizado").value;
-
-      // Se 'Outros' estiver selecionado e tiver texto, adiciona ao array
-      if (drogasVasoativas.includes("Outros") && drogasOutros) {
-        const index = drogasVasoativas.indexOf("Outros");
-        drogasVasoativas[index] = `Outros: ${drogasOutros}`;
-      }
-
-      infoUTI = `
-Paciente veio da UTI:
-- Intubado: ${intubado || "não informado"}
-- Tipo de ventilação: ${tipoVentilacao || "não informado"}
-- Drogas vasoativas: ${drogasVasoativas.length ? drogasVasoativas.join(", ") : "nenhuma"}
-- Sedação: ${sedacaoUTI || "não informado"}
-- Monitorizado: ${monitorizado || "não informado"}
-`.trim();
-    }
-
-    // Texto origem para S
-    let origemTexto = "";
-    switch (origem) {
-      case "emergencia":
-        origemTexto = "Paciente veio do Setor de Emergência.";
-        break;
-      case "enfermaria":
-        origemTexto = "Paciente veio da Enfermaria.";
-        break;
-      case "uti":
-        origemTexto = "Paciente veio da Unidade de Terapia Intensiva (UTI).";
-        break;
-      default:
-        origemTexto = "Origem do paciente não informada.";
-    }
-
-    textoGerado = `# ${nome}, ${idade} anos, sexo ${sexo}
-# Motivo da internação: ${motivo}
-
-# S
-${origemTexto}
-${origem === "uti" ? infoUTI + "\n" : ""}
-Paciente vem com história de ${motivo.toLowerCase()}.
-Vem ao Centro Cirúrgico para realização de ${procedimento.toLowerCase()} em regime de ${urgencia.toLowerCase()}.
+   const drogasComb=drogas.length?` em uso de ${drogas.join(", ")}${outras?`, ${outras}`:""}.`:"."; 
+   textoUTI+=drogasComb;
+   situacaoText+=textoUTI+"\n";
+   if(int==="Não"){
+     // Via aérea detalhada
+     const seq=document.getElementById("sequencia").value;
+     const tubo=document.getElementById("numTubo").value;
+     const aram=document.getElementById("aramado").value;
+     const disp=document.getElementById("dispositivo").value;
+     const cor=document.getElementById("cormack").value;
+     const bou=document.getElementById("bougie").value;
+     const inter=document.getElementById("intercorrenciasViaAerea").value;
+     situacaoText+=`Paciente submetido à sequência ${seq.toLowerCase()}, intubado com tubo ${aram.toLowerCase()} nº ${tubo}, utilizando ${disp.toLowerCase()}, Cormack ${cor}, ${bou==="Sim"?"com":"sem"} bougie, ${inter ? inter : "sem intercorrências"}.\n`;
+   } else {
+     situacaoText+=`Paciente já intubado previamente.\n`;
+   }
+ } else if(o==="emergência"||o==="enfermaria"){
+   situacaoText+=`Procedente da ${o}, encaminhado ao centro cirúrgico.\n`;
+ }
+ 
+ const background=`Comorbidades e antecedentes informados. Alergias: ${alerg}. Peso ${peso} kg (ideal ${pi.toFixed(1)} kg, ajustado ${pa.toFixed(1)} kg).\n`;
+ const avaliacao=`Será submetido a ${p.toLowerCase()} em caráter ${u.toLowerCase()}.\n`;
+ const textoFinal=`# S
+${situacaoText}
 
 # B
-Peso: ${pesoPaciente} kg, Altura: ${alturaPaciente} cm
-Peso ideal (altura): ${pesoIdeal ? pesoIdeal.toFixed(1) : "não informado"} kg
-Peso ideal ajustado: ${pesoIdeal ? pesoAjustado.toFixed(1) : "não informado"} kg
-Alergias: ${alergias}
-Comorbidades: ${comorbidades}.
-Cirurgias prévias: ${cirurgias}.
-Em uso de ${medicacoes}.
+${background}
 
 # A
-Realizado anestesia ${anestesia.toLowerCase()}.
-Indução anestésica: ${induçao}.
-Via aérea: ${viaAerea}.
-Hemodinâmica: ${hemodinamica}.
-Pulmonar: ${respiracao}.
-Renal: ${renal}.
-Infeccioso: ${infeccao}.
-Hemato: ${hemato}.
-Endócrino: ${endocrino}.
-Dispositivos: ${dispositivos}.
-
-# R
-Transporte: ${transporte}, ${sedacao}, ${ventilacao}, ${intercorrencias}.
-`;
-
-    document.getElementById("resultado").textContent = textoGerado;
-  }
-
-  function copiarTexto() {
-    if (!textoGerado) return alert("Gere o relatório primeiro.");
-    navigator.clipboard.writeText(textoGerado)
-      .then(() => alert("Relatório copiado para a área de transferência!"))
-      .catch(() => alert("Erro ao copiar. Copie manualmente."));
-  }
-
-  async function gerarPDF() {
-    if (!textoGerado) return alert("Gere o relatório primeiro.");
-
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    const linhas = textoGerado.split('\n');
-    let y = 10;
-
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(12);
-
-    linhas.forEach(linha => {
-      if (y > 280) {
-        doc.addPage();
-        y = 10;
-      }
-      doc.text(linha, 10, y);
-      y += 8;
-    });
-
-    doc.save("relatorio-sbar.pdf");
-  }
+${avaliacao}`;
+ document.getElementById("resultado").textContent=textoFinal;
+}
 </script>
-
 </body>
 </html>
