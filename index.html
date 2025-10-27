@@ -38,7 +38,7 @@
   <div class="container">
     <header>
       <h1>SBAR Anestesia</h1>
-      <div class="muted">Gerador de texto intraoperatório — versão avançada</div>
+      <div class="muted">Gerador de texto intraoperatório — VERSÃO TESTE</div>
     </header>
 
     <!-- SITUAÇÃO -->
@@ -626,6 +626,7 @@
     }
 
     function gerarSituacao(){
+      lines.push('# S');
       const nome = $('nome').value.trim() || 'Paciente';
       const sexo = $('sexo').value;
       const idade = $('idade').value ? (', ' + $('idade').value + ' anos') : '';
