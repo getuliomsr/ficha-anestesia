@@ -626,7 +626,6 @@
     }
 
     function gerarSituacao(){
-      lines.push('# S');
       const nome = $('nome').value.trim() || 'Paciente';
       const sexo = $('sexo').value;
       const idade = $('idade').value ? (', ' + $('idade').value + ' anos') : '';
@@ -917,7 +916,6 @@
     let textoGerado = '';
     function gerarSBAR(full=true){
       if(!validateBeforeGenerate()) return;
-
       const s = gerarSituacao();
       const b = gerarBackground();
       const a = gerarAvaliacao();
