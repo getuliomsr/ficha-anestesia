@@ -1,998 +1,700 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>SBAR Anestesia</title>
-  <style>
-    :root{
-      --accent:#2c7be5; --muted:#566; --bg:#f3f7fb; --card:#fff; --radius:10px;
-    }
-    body{font-family:Inter, "Segoe UI", Roboto, Arial, sans-serif; background:var(--bg); margin:0; padding:18px; color:#123;}
-    .container{max-width:980px;margin:0 auto;}
-    header{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
-    header h1{margin:0;font-size:20px;color:var(--accent)}
-    .muted{color:var(--muted);font-size:13px}
-    .card{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:0 2px 8px rgba(20,30,60,0.06);margin-bottom:12px}
-    details{margin-bottom:8px;border-radius:8px;overflow:hidden}
-    summary{cursor:pointer;padding:10px 12px;background:linear-gradient(180deg, rgba(0,0,0,0.02), transparent);font-weight:600;border-bottom:1px solid rgba(0,0,0,0.04);display:flex;align-items:center;justify-content:space-between}
-    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-    .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-    label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
-    input[type="text"],input[type="number"],select,textarea{width:100%;padding:8px;border:1px solid #d6dde8;border-radius:6px;font-size:14px;background:#fff;box-sizing:border-box}
-    textarea{min-height:70px;resize:vertical}
-    .inline{display:flex;gap:8px;align-items:center}
-    .inline > *{flex:1}
-    .small{max-width:220px}
-    .checkbox-group{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-    .checkbox-group label{font-weight:500;font-size:13px;cursor:pointer;color:#243447}
-    .actions{display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap}
-    button{background:var(--accent);color:#fff;border:0;padding:9px 12px;border-radius:8px;cursor:pointer}
-    button.secondary{background:#6c757d}
-    #resultado{white-space:pre-wrap;padding:12px;background:#fcfdff;border-radius:8px;border:1px solid #e6eefc;min-height:120px}
-    .hint{font-size:12px;color:var(--muted);margin-top:6px}
-    @media(max-width:720px){.grid{grid-template-columns:1fr}.grid-3{grid-template-columns:1fr} header{flex-direction:column;align-items:flex-start;gap:6px}}
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SBAR Anestesia</title>
+<style>
+:root{--primary:#2563eb;--primary-dark:#1e40af;--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--muted:#64748b;--bg:#f8fafc;--card:#fff;--border:#e2e8f0;--text:#0f172a;--text-light:#475569;--radius:12px;--shadow:0 1px 3px rgba(0,0,0,0.1)}
+*{box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:var(--bg);margin:0;padding:20px;color:var(--text);line-height:1.6}
+.container{max-width:1000px;margin:0 auto}
+header{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;padding:24px;border-radius:var(--radius);margin-bottom:20px;box-shadow:var(--shadow)}
+header h1{margin:0 0 8px;font-size:24px;font-weight:700}
+header .subtitle{opacity:0.9;font-size:14px}
+.card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:16px;border:1px solid var(--border)}
+details{margin-bottom:12px}
+summary{cursor:pointer;padding:14px 16px;background:var(--card);font-weight:600;border-radius:8px;border:2px solid var(--border);display:flex;align-items:center;justify-content:space-between;transition:all 0.2s;user-select:none}
+summary:hover{border-color:var(--primary);background:#f8fafc}
+details[open] summary{border-bottom-left-radius:0;border-bottom-right-radius:0;background:var(--primary);color:#fff;border-color:var(--primary)}
+.section-content{padding:20px;border:2px solid var(--border);border-top:none;border-bottom-left-radius:8px;border-bottom-right-radius:8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.field{margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+label{font-size:13px;color:var(--text-light);display:block;margin-bottom:6px;font-weight:500}
+input[type="text"],input[type="number"],select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--card);transition:border-color 0.2s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)}
+textarea{min-height:80px;resize:vertical;font-family:inherit}
+.inline{display:flex;gap:10px;align-items:center}
+.checkbox-group{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+.checkbox-label{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px;padding:6px 12px;border-radius:6px;transition:background 0.2s}
+.checkbox-label:hover{background:#f1f5f9}
+.checkbox-label input[type="checkbox"]{cursor:pointer;width:16px;height:16px}
+.divider{height:1px;background:var(--border);margin:20px 0}
+.subsection{background:#f8fafc;padding:16px;border-radius:8px;margin-top:12px;border-left:3px solid var(--primary)}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+button{padding:12px 20px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s}
+button.primary{background:var(--primary);color:#fff}
+button.primary:hover{background:var(--primary-dark);transform:translateY(-1px)}
+button.secondary{background:#64748b;color:#fff}
+button.secondary:hover{background:#475569}
+#resultado{white-space:pre-wrap;padding:20px;background:#fff;border-radius:var(--radius);border:2px solid var(--border);min-height:200px;font-size:14px;line-height:1.8}
+.resultado-vazio{color:var(--muted);text-align:center;padding:40px;font-style:italic}
+.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;text-transform:uppercase}
+.badge.success{background:#d1fae5;color:#065f46}
+.badge.warning{background:#fef3c7;color:#92400e}
+.badge.info{background:#dbeafe;color:#1e40af}
+@media(max-width:768px){.grid,.grid-3{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>SBAR Anestesia</h1>
-      <div class="muted">Gerador de texto intraoperatório — VERSÃO TESTE</div>
-    </header>
-
-    <!-- SITUAÇÃO -->
-    <details open class="card">
-      <summary>🟢 Situação</summary>
-      <div style="padding:12px 6px;">
-        <div class="grid">
-          <div>
-            <label>Nome / Sexo / Idade</label>
-            <div class="inline">
-              <input type="text" id="nome" placeholder="Ex: João Silva"/>
-              <select id="sexo"><option value="">Sexo</option><option value="masculino">Masculino</option><option value="feminino">Feminino</option></select>
-              <input type="number" id="idade" placeholder="Idade" min="0"/>
-            </div>
-            <div class="hint">  </div>
-          </div>
-
-          <div>
-            <label>Motivo da internação / Procedimento planejado</label>
-            <div class="inline">
-              <input type="text" id="motivo" placeholder="Ex: Apendicite aguda"/>
-              <input type="text" id="procedimento" placeholder="Ex: Apendicectomia videolaparoscópica"/>
-            </div>
-            <div class="hint">  </div>
-          </div>
-        </div>
-
-        <div class="grid" style="margin-top:10px">
-          <div>
-            <label>Origem do paciente</label>
-            <select id="origem">
-              <option value="">Selecione</option>
-              <option value="emergencia">Setor de Emergência</option>
-              <option value="enfermaria">Enfermaria</option>
-              <option value="uti">UTI</option>
-            </select>
-          </div>
-
-          <div>
-            <label>Chegada já intubado / monitorizado / VM</label>
-            <div class="checkbox-group">
-              <label><input type="checkbox" id="chegaIntubado" /> Intubado</label>
-              <label><input type="checkbox" id="chegaMonitorizado" /> Monitorizado</label>
-              <label><input type="checkbox" id="chegaVM" /> Em VM</label>
-            </div>
-            <div class="hint">Disponível para Emergência e UTI.</div>
-          </div>
-        </div>
-
-        <div id="origemDetalhes" style="margin-top:10px;display:none;">
-          <div class="card" style="padding:10px">
-            <label>Ventilação (na origem)</label>
-            <div class="checkbox-group">
-              <label><input type="checkbox" id="origVM" value="Ventilação mecânica" /> Ventilação mecânica</label>
-              <label><input type="checkbox" id="origEspont" value="Espontâneo" /> Espontâneo</label>
-              <label><input type="checkbox" id="origO2" value="O2 suplementar" /> O₂ suplementar</label>
-              <label><input type="checkbox" id="origTraq" value="Traqueostomia" /> Traqueostomia</label>
-            </div>
-
-            <label style="margin-top:8px">Drogas vasoativas (na origem)</label>
-            <div class="checkbox-group" id="drogasOrigem">
-              <label><input type="checkbox" value="Noradrenalina" /> Noradrenalina</label>
-              <label><input type="checkbox" value="Vasopressina" /> Vasopressina</label>
-              <label><input type="checkbox" value="Dobutamina" /> Dobutamina</label>
-              <label><input type="checkbox" value="Efedrina" /> Efedrina</label>
-              <label><input type="checkbox" value="Metaraminol" /> Metaraminol</label>
-              <label><input type="checkbox" id="drogasOrigemOutrosChk" value="Outros" /> Outros</label>
-              <input type="text" id="drogasOrigemOutros" class="small" style="display:none" placeholder="Especifique outros"/>
-            </div>
-          </div>
-        </div>
-      </div>
-    </details>
-
-    <!-- BACKGROUND -->
-    <details class="card" open>
-      <summary>🔷 Background</summary>
-      <div style="padding:12px 6px;">
-        <div class="grid">
-          <div>
-            <label>ASA</label>
-            <div class="inline">
-              <select id="asa"><option value="">ASA</option><option>ASA I</option><option>ASA II</option><option>ASA III</option><option>ASA IV</option><option>ASA V</option></select>
-              <label style="margin-left:6px"><input type="checkbox" id="asaE" /> E (emergência)</label>
-            </div>
-            <div class="hint">Marque E se for caso de emergência.</div>
-          </div>
-
-          <div>
-            <label>Peso / Altura</label>
-            <div class="inline">
-              <input type="number" id="peso" placeholder="kg" min="0"/>
-              <input type="number" id="altura" placeholder="cm" min="0"/>
-            </div>
-            <div class="hint">Peso e altura na mesma linha.</div>
-          </div>
-        </div>
-
-        <div style="margin-top:10px" class="grid">
-          <div>
-            <label>Alergias</label>
-            <input type="text" id="alergias" placeholder="Ex: Penicilina"/>
-          </div>
-
-          <div>
-            <label>Comorbidades</label>
-            <div class="checkbox-group" id="comorbidadesDiv">
-              <label><input type="checkbox" value="Hipertensão" /> Hipertensão</label>
-              <label><input type="checkbox" value="DM" id="dmChk" /> DM</label>
-              <label><input type="checkbox" value="DAC" /> DAC</label>
-              <label><input type="checkbox" value="DPOC" /> DPOC</label>
-              <label><input type="checkbox" value="DRC" /> DRC</label>
-              <label><input type="checkbox" id="comorbOutrosChk" value="Outros" /> Outros</label>
-              <input type="text" id="comorbOutrosTxt" class="small" style="display:none" placeholder="Especifique outras"/>
-              <label style="width:100%;margin-top:6px"><input type="checkbox" id="semComorb" /> Sem comorbidades</label>
-            </div>
-          </div>
-        </div>
-
-        <div style="margin-top:10px" class="grid">
-          <div>
-            <label>Cirurgias prévias</label>
-            <input type="text" id="cirurgias" placeholder="Ex: Revascularização miocárdica"/>
-          </div>
-          <div>
-            <label>Medicações em uso</label>
-            <input type="text" id="medicacoes" placeholder="Ex: Losartana, Metformina"/>
-          </div>
-        </div>
-
-        <div style="margin-top:10px" class="grid">
-          <div>
-            <label>Tipo de cirurgia (porte)</label>
-            <select id="tipoCirurgia">
-              <option value="">Selecione</option>
-              <option value="pequeno">Pequeno porte</option>
-              <option value="médio">Médio porte</option>
-              <option value="grande">Grande porte</option>
-            </select>
-          </div>
-          <div>
-            <label>Observações background</label>
-            <input type="text" id="bgObs" placeholder="Observações rápidas"/>
-          </div>
-        </div>
-
-      </div>
-    </details>
-
-    <!-- AVALIAÇÃO -->
-    <details class="card" open>
-      <summary>🟠 Avaliação (intraoperatório)</summary>
-      <div style="padding:12px 6px;">
-
-        <!-- Indução / Via aérea -->
-        <label>Indução anestésica / Via aérea</label>
-        <div class="card" style="padding:10px;margin-bottom:10px">
-          <div class="grid">
-            <div>
-              <label>Paciente já intubado (origem)?</label>
-              <div class="checkbox-group">
-                <label><input type="checkbox" id="jaIntubado" /> Sim (oculta campo de indução)</label>
-              </div>
-            </div>
-            <div>
-              <label>Dispositivo</label>
-              <select id="deviceType">
-                <option value="tubo">Tubo oro/nasotraqueal</option>
-                <option value="ml">Máscara laríngea</option>
-                <option value="otra">Outro</option>
-              </select>
-            </div>
-          </div>
-
-          <div id="inducaoCampos" style="margin-top:8px">
-            <div class="grid">
-              <div>
-                <label>Cormack-Lehane</label>
-                <select id="cormack">
-                  <option value="I">I</option><option value="IIa">IIa</option><option value="IIb">IIb</option>
-                  <option value="III">III</option><option value="IV">IV</option>
-                </select>
-              </div>
-              <div>
-                <label>Tubo / Máscara - nº</label>
-                <input type="text" id="tuboNum" placeholder="Ex: 8 (tubo) ou 4 (mascara)"/>
-              </div>
-            </div>
-
-            <div class="grid" style="margin-top:8px">
-              <div>
-                <label>Rima (cm)</label>
-                <input type="number" id="rima" placeholder="Ex: 20" min="0"/>
-              </div>
-              <div>
-                <label>Oro / Naso</label>
-                <select id="oroNaso"><option value="oro">Orotraqueal</option><option value="naso">Nasotraqueal</option></select>
-              </div>
-            </div>
-
-            <div style="margin-top:8px" class="checkbox-group">
-              <label><input type="checkbox" id="aramado" /> Aramado</label>
-              <label><input type="checkbox" id="video" /> Uso de videolaringoscópio</label>
-              <label><input type="checkbox" id="fibro" /> Fibrobroncoscópio</label>
-              <label><input type="checkbox" id="bougie" /> Bougie</label>
-              <label><input type="checkbox" id="vaDificil" /> Via aérea difícil</label>
-              <label><input type="checkbox" id="ventDificil" /> Ventilação difícil</label>
-            </div>
-
-            <div style="margin-top:8px">
-              <label>Intercorrências / observações via aérea</label>
-              <input type="text" id="inducaoObs" placeholder="Descreva intercorrências (se houver)"/>
-            </div>
-          </div>
-          <div class="hint">Se o paciente já chega intubado pela orig (UTI/Emergência), marque "Paciente já intubado" para ocultar estes campos (não preenchê-los).</div>
-        </div>
-
-        <!-- Tipo de anestesia -->
-        <label>Tipo de anestesia</label>
-        <div class="checkbox-group" id="anestesiaDiv">
-          <label><input type="checkbox" id="agBalanceada" /> AG balanceada</label>
-          <label><input type="checkbox" id="tiva" /> TIVA</label>
-          <label><input type="checkbox" id="sedacao" /> Sedação</label>
-          <label><input type="checkbox" id="combinada" /> Combinada</label>
-        </div>
-
-        <div id="combinadaOpcoes" style="display:none;margin-top:8px">
-          <label>Se combinada, quais?</label>
-          <div class="checkbox-group">
-            <label><input type="checkbox" id="raqui" /> Raquianestesia</label>
-            <label><input type="checkbox" id="peridural" /> Peridural</label>
-            <label><input type="checkbox" id="bloqueioPerif" /> Bloqueio periférico</label>
-            <label><input type="checkbox" id="combOutrosChk" /> Outros</label>
-            <input type="text" id="combOutrosTxt" class="small" style="display:none" placeholder="Especifique outros"/>
-          </div>
-        </div>
-
-        <hr style="margin:12px 0;border:none;border-top:1px solid #eef5ff"/>
-
-        <!-- Monitorização -->
-        <label>Monitorização</label>
-        <div>
-          <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="monitorPadrao" checked /> <strong>Monitorização padrão (ECG, SpO₂, PNI, capnografia)</strong></label>
-          <div class="checkbox-group" id="monitorExtras" style="margin-top:6px">
-            <label><input type="checkbox" id="monTemp" value="Temperatura" /> Temperatura</label>
-            <label><input type="checkbox" id="monPAI" value="PAI" /> PAI</label>
-            <label><input type="checkbox" id="monPVC" value="PVC" /> PVC</label>
-            <label><input type="checkbox" id="monBIS" value="BIS" /> BIS</label>
-            <label><input type="checkbox" id="monOutrosChk" value="Outros" /> Outros</label>
-            <input type="text" id="monOutrosTxt" class="small" style="display:none" placeholder="Especifique"/>
-          </div>
-          <div class="hint">Se PAI marcado, o relatório não repetirá PNI (evita redundância).</div>
-        </div>
-
-        <hr style="margin:12px 0;border:none;border-top:1px solid #eef5ff"/>
-
-        <!-- Hemodinâmica -->
-        <label>Hemodinâmica</label>
-        <div>
-          <div class="checkbox-group">
-            <label><input type="checkbox" id="hemoEstavel" checked /> Estável</label>
-            <label><input type="checkbox" id="hemoInstavel" /> Instável</label>
-          </div>
-
-          <div id="hemoInstDetalhes" style="display:none;margin-top:8px">
-            <label>Se instável, marque vasopressores / arritmia / outras</label>
-            <div class="checkbox-group" style="margin-top:6px">
-              <label><input type="checkbox" id="usoVaso" /> Uso de vasopressores</label>
-              <label><input type="checkbox" id="hemoArritmia" value="Arritmia" /> Arritmia</label>
-              <label><input type="checkbox" id="hemoOutrasChk" value="Outras" /> Outras</label>
-            </div>
-
-            <div id="vasoDetalhes" style="display:none;margin-top:8px">
-              <label>Vasopressores utilizados (se aplicável)</label>
-              <div class="checkbox-group">
-                <label><input type="checkbox" class="vasoChk" value="Noradrenalina" /> Noradrenalina</label>
-                <label><input type="checkbox" class="vasoChk" value="Vasopressina" /> Vasopressina</label>
-                <label><input type="checkbox" class="vasoChk" value="Dobutamina" /> Dobutamina</label>
-                <label><input type="checkbox" class="vasoChk" value="Nitroprussiato" /> Nitroprussiato</label>
-                <label><input type="checkbox" class="vasoChk" value="Nitroglicerina" /> Nitroglicerina</label>
-                <label><input type="checkbox" class="vasoChk" value="Efedrina" /> Efedrina</label>
-                <label><input type="checkbox" class="vasoChk" value="Metaraminol" /> Metaraminol</label>
-                <label><input type="checkbox" id="vasoOutrosChk" value="Outros" /> Outros</label>
-                <input type="text" id="vasoOutrosTxt" class="small" style="display:none" placeholder="Especifique outros"/>
-              </div>
-            </div>
-
-            <div style="margin-top:8px">
-              <label>Observações hemodinâmicas</label>
-              <input type="text" id="hemoObs" placeholder="Ex: episódios de hipotensão, resposta a bolus..."/>
-            </div>
-          </div>
-        </div>
-
-        <hr style="margin:12px 0;border:none;border-top:1px solid #eef5ff"/>
-
-        <!-- Respiratório -->
-        <label>Respiratório</label>
-        <div>
-          <div class="checkbox-group" id="respDiv">
-            <label><input type="checkbox" id="respVM" /> Em VM</label>
-            <label><input type="checkbox" id="respEspont" /> Espontâneo</label>
-            <label><input type="checkbox" id="respO2" /> O₂ suplementar</label>
-            <label><input type="checkbox" id="respTraq" /> Traqueostomizado</label>
-            <label><input type="checkbox" id="respOutrosChk" value="Outros" /> Outros</label>
-          </div>
-
-          <div id="vmParams" style="display:none;margin-top:8px">
-            <label>Parâmetros ventilatórios</label>
-            <div class="grid-3" style="gap:8px">
-              <div>
-                <label>Modo</label>
-                <select id="vmModo"><option value="VCV">VCV</option><option value="PCV">PCV</option><option value="PS">PS</option></select>
-              </div>
-              <div>
-                <label>Vc (mL)</label>
-                <input type="number" id="vmVc" min="0" placeholder="500"/>
-              </div>
-              <div>
-                <label>FR (ipm)</label>
-                <input type="number" id="vmFr" min="0" placeholder="12"/>
-              </div>
-            </div>
-
-            <div class="grid" style="margin-top:8px">
-              <div>
-                <label>FiO₂</label>
-                <input type="text" id="vmFiO2" placeholder="0,5"/>
-              </div>
-              <div>
-                <label>PEEP (cmH₂O)</label>
-                <input type="number" id="vmPeep" min="0" placeholder="5"/>
-              </div>
-              <div>
-                <label>Ppico (cmH₂O)</label>
-                <input type="number" id="vmPico" min="0" placeholder="--"/>
-              </div>
-            </div>
-
-            <div style="margin-top:8px" class="inline">
-              <div style="flex:1">
-                <label>dP (Driving-pressure)</label>
-                <input type="text" id="vmDelta" placeholder="Ex: &lt;15"/>
-              </div>
-              <div style="flex:1">
-                <label>Observações ventilatórias</label>
-                <input type="text" id="respInterc" placeholder="Intercorrências / observações (se houver)"/>
-              </div>
-            </div>
-            <div class="hint">Padrões iniciais: VCV, Vc 500 mL, FR 12, FiO₂ 0,5, PEEP 5 cmH₂O.</div>
-          </div>
-        </div>
-
-        <hr style="margin:12px 0;border:none;border-top:1px solid #eef5ff"/>
-
-        <!-- Renal -->
-        <div class="grid">
-          <div>
-            <label>Renal - Aporte (mL)</label>
-            <input type="number" id="aporteLiquidos" placeholder="Ex: 2000" min="0"/>
-          </div>
-          <div>
-            <label>Renal - Diurese (mL)</label>
-            <input type="number" id="diurese" placeholder="Ex: 500" min="0"/>
-          </div>
-        </div>
-
-        <hr style="margin:12px 0;border:none;border-top:1px solid #eef5ff"/>
-
-        <!-- Infeccioso -->
-        <label>Infeccioso</label>
-        <div class="grid" style="align-items:center">
-          <div>
-            <label>Antibiótico</label>
-            <input type="text" id="antibiotico" placeholder="Ex: Ceftriaxona"/>
-          </div>
-          <div>
-            <label>Horário de repique</label>
-            <input type="text" id="horarioRepique" placeholder="Ex: 06:00 / 18:00"/>
-          </div>
-        </div>
-        <input type="text" id="infOutros" placeholder="Outras informações infecciosas (opcional)" style="margin-top:8px"/>
-
-        <hr style="margin:12px 0;border:none;border-top:1px solid #eef5ff"/>
-
-        <!-- Hematológico -->
-        <label>Hematológico</label>
-        <div>
-          <label><input type="checkbox" id="transfusaoChk" /> Transfusão realizada</label>
-
-          <div id="transfusaoDetalhes" style="display:none;margin-top:8px">
-            <label>Quantidade por hemocomponente</label>
-            <div class="grid">
-              <div><label>CH (unidades)</label><input type="number" id="qtyCH" min="0" placeholder="Ex: 2"/></div>
-              <div><label>PFC (unidades)</label><input type="number" id="qtyPFC" min="0" placeholder="Ex: 1"/></div>
-            </div>
-            <div class="grid" style="margin-top:8px">
-              <div><label>Plaquetas (unidades)</label><input type="number" id="qtyPlaq" min="0" placeholder="Ex: 1"/></div>
-              <div><label>Crioprecipitado (unidades)</label><input type="number" id="qtyCriop" min="0" placeholder="Ex: 0"/></div>
-            </div>
-            <div style="margin-top:8px">
-              <label>Outros hemocomponentes</label>
-              <input type="text" id="hemoOutrosTxt" placeholder="Ex: 1 unidade de concentrado plaquetário..."/>
-            </div>
-            <div style="margin-top:8px" class="inline">
-              <div style="flex:1"><label>Sangramento estimado (mL)</label><input type="number" id="sangramentoEstimado" min="0" placeholder="Ex: 600"/></div>
-              <div style="flex:1"><label>Observações hematológicas</label><input type="text" id="hemoObs" placeholder="Observações"/></div>
-            </div>
-          </div>
-        </div>
-
-        <hr style="margin:12px 0;border:none;border-top:1px solid #eef5ff"/>
-
-        <!-- Endócrino -->
-        <label>Endócrino</label>
-        <div class="inline">
-          <input type="text" id="glicemia" placeholder="Glicemia (mg/dL)"/>
-          <input type="text" id="endocrinoObs" placeholder="Outras considerações endócrinas"/>
-        </div>
-
-        <hr style="margin:12px 0;border:none;border-top:1px solid #eef5ff"/>
-
-        <!-- Laboratoriais -->
-        <label>Dados laboratoriais (campo livre)</label>
-        <input type="text" id="labs" placeholder="Ex: Hb 12,3 g/dL; gasometria: pH 7,38; Na 140; K 3,9"/>
-
-      </div>
-    </details>
-
-    <!-- RECOMENDAÇÃO -->
-    <details class="card" open>
-      <summary>🔴 Recomendação</summary>
-      <div style="padding:12px 6px;">
-        <div class="grid">
-          <div>
-            <label>Transporte / Monitorização</label>
-            <div class="checkbox-group">
-              <label><input type="checkbox" id="monitorizacaoContinua" /> Monitorização contínua</label>
-              <label><input type="checkbox" id="usoVasoTransp" /> Uso de drogas vasoativas</label>
-            </div>
-          </div>
-
-          <div>
-            <label>Sedação</label>
-            <div class="checkbox-group" id="sedacaoDiv">
-              <label><input type="checkbox" value="Sedado" /> Sedado</label>
-              <label><input type="checkbox" value="Despertando" /> Despertando</label>
-              <label><input type="checkbox" value="Acordado" /> Acordado</label>
-            </div>
-          </div>
-        </div>
-
-        <div style="margin-top:10px">
-          <label>Ventilação/Observações</label>
-          <div class="checkbox-group" id="ventilacaoDiv">
-            <label><input type="checkbox" value="Em ventilação mecânica" /> Em VM</label>
-            <label><input type="checkbox" value="Espontaneamente" /> Espontaneamente</label>
-            <label><input type="checkbox" value="O2 suplementar" /> O2 suplementar</label>
-            <label><input type="checkbox" value="Traqueostomizado" /> Traqueostomizado</label>
-          </div>
-          <textarea id="observacoes" placeholder="Observações / recomendações (opcional)"></textarea>
-        </div>
-
-        <div class="actions">
-          <button id="btnGerar">Gerar Relatório</button>
-          <button class="secondary" id="btnResumoCurto">Gerar Resumo Curto</button>
-          <button class="secondary" id="btnCopiar">Copiar Relatório</button>
-          <button id="btnPDF">Gerar PDF</button>
-          <button class="secondary" id="btnNovo">Novo caso</button>
-        </div>
-      </div>
-    </details>
-
-    <h2 style="margin-top:6px">📝 Relatório Gerado</h2>
-    <div id="resultado" class="card"></div>
-  </div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script>
-    // Helper shortcuts
-    const $ = id => document.getElementById(id);
-    const show = id => { if($(id)) $(id).style.display = 'block'; };
-    const hide = id => { if($(id)) $(id).style.display = 'none'; };
-    const isChecked = id => (!!$(id) && $(id).checked);
-    const checkedValues = nodeList => Array.from(nodeList).filter(n=>n.checked && n.value).map(n=>n.value);
-    const join = arr => arr.filter(Boolean).join(', ');
-
-    // UI wiring
-    function initUI(){
-      // origem details (show when origem is uti or emergencia)
-      $('origem').addEventListener('change', ()=>{
-        const v = $('origem').value;
-        if(v==='uti' || v==='emergencia') show('origemDetalhes'); else hide('origemDetalhes');
-      });
-
-      // drugs origin others
-      $('drogasOrigemOutrosChk').addEventListener('change', (e)=> { if(e.target.checked) show('drogasOrigemOutros'); else hide('drogasOrigemOutros'); });
-
-      // sem comorb
-      $('semComorb').addEventListener('change', (e)=> {
-        if(e.target.checked){
-          document.querySelectorAll('#comorbidadesDiv input[type="checkbox"]').forEach(cb=>{ if(cb.id!=='semComorb') cb.checked=false; });
-        }
-      });
-      $('comorbOutrosChk').addEventListener('change', (e)=> { if(e.target.checked) show('comorbOutrosTxt'); else hide('comorbOutrosTxt'); });
-
-      // combinada
-      $('combinada').addEventListener('change', e=> { if(e.target.checked) show('combinadaOpcoes'); else hide('combinadaOpcoes'); });
-      $('combOutrosChk').addEventListener('change', e=> { if(e.target.checked) show('combOutrosTxt'); else hide('combOutrosTxt'); });
-
-      // monitor extras
-      $('monOutrosChk').addEventListener('change', e=> { if(e.target.checked) show('monOutrosTxt'); else hide('monOutrosTxt'); });
-
-      // hemodinamica toggles
-      $('hemoInstavel').addEventListener('change', e=>{
-        if(e.target.checked){ show('hemoInstDetalhes'); $('hemoEstavel').checked = false; }
-        else { hide('hemoInstDetalhes'); }
-      });
-      $('hemoEstavel').addEventListener('change', e=>{ if(e.target.checked){ $('hemoInstavel').checked=false; hide('hemoInstDetalhes'); } });
-
-      $('usoVaso').addEventListener('change', e=>{ if(e.target.checked) show('vasoDetalhes'); else hide('vasoDetalhes'); });
-      $('vasoOutrosChk').addEventListener('change', e=>{ if(e.target.checked) show('vasoOutrosTxt'); else hide('vasoOutrosTxt'); });
-
-      // transfusão
-      $('transfusaoChk').addEventListener('change', e=>{ if(e.target.checked) show('transfusaoDetalhes'); else hide('transfusaoDetalhes'); });
-
-      // ventilação params show/hide
-      $('respVM').addEventListener('change', e=>{ if(e.target.checked) show('vmParams'); else hide('vmParams'); });
-
-      // respOutros placeholder (no UI)
-      // indução: hide fields if jaIntubado
-      $('jaIntubado').addEventListener('change', e=>{ if(e.target.checked) hide('inducaoCampos'); else show('inducaoCampos'); });
-
-      // device type: if máscara, placeholder for nº
-      $('deviceType').addEventListener('change', e=>{
-        const v = e.target.value;
-        if(v==='ml'){ $('tuboNum').placeholder = 'Ex: 4 (máscara)'; }
-        else { $('tuboNum').placeholder = 'Ex: 8 (tubo)'; }
-      });
-
-      // combinadaOutros toggles
-      $('combOutrosChk').addEventListener('change', e=>{ if(e.target.checked) show('combOutrosTxt'); else hide('combOutrosTxt'); });
-
-      // default prechecks
-      window.addEventListener('load', ()=>{
-        $('monitorPadrao').checked = true;
-        $('hemoEstavel').checked = true;
-        setDefaultsBySex();
-      });
-
-      // Adjust induction defaults when sex changes
-      $('sexo').addEventListener('change', setDefaultsBySex);
-    }
-
-    function setDefaultsBySex(){
-      const sexo = $('sexo').value;
-      if(sexo==='masculino'){
-        if(!$('tuboNum').value) $('tuboNum').value = '8';
-      } else if(sexo==='feminino'){
-        if(!$('tuboNum').value) $('tuboNum').value = '7.5';
-      } else {
-        // no sex chosen: leave default 7.5
-        if(!$('tuboNum').value) $('tuboNum').value = '7.5';
-      }
-      if(!$('cormack').value) $('cormack').value = 'I';
-      if(!$('rima').value) $('rima').value = 20;
-      // VM defaults
-      if(!$('vmVc').value) $('vmVc').value = 500;
-      if(!$('vmFr').value) $('vmFr').value = 12;
-      if(!$('vmFiO2').value) $('vmFiO2').value = '0,5';
-      if(!$('vmPeep').value) $('vmPeep').value = 5;
-      if(!$('vmDelta').value) $('vmDelta').value = '<15';
-    }
-
-    // Text generation helpers
-    function genderArticle(){
-      const s = $('sexo').value;
-      if(s==='feminino') return 'A paciente';
-      return 'O paciente';
-    }
-    function genderLower(){
-      const s = $('sexo').value;
-      if(s==='feminino') return 'a paciente';
-      return 'o paciente';
-    }
-
-    function gerarSituacao(){
-      const nome = $('nome').value.trim() || 'Paciente';
-      const sexo = $('sexo').value;
-      const idade = $('idade').value ? (', ' + $('idade').value + ' anos') : '';
-      const ident = `${nome}${idade}${sexo?`, sexo ${sexo}`:''}`;
-      const motivo = $('motivo').value.trim();
-      const proc = $('procedimento').value.trim();
-      const origem = $('origem').value;
-      let origemFrase = '';
-      if(origem==='emergencia') origemFrase = 'proveniente do Setor de Emergência';
-      if(origem==='enfermaria') origemFrase = 'proveniente da enfermaria';
-      if(origem==='uti') origemFrase = 'proveniente da UTI';
-
-      // origem extras (intubado/monitorizado/vm/drogas)
-      if((origem==='uti' || origem==='emergencia')){
-        const parts = [];
-        if($('chegaIntubado').checked) parts.push('intubado');
-        if($('chegaMonitorizado').checked) parts.push('monitorizado');
-        if($('chegaVM').checked) parts.push('em ventilação mecânica');
-        // drogas
-        const drogas = checkedValues(document.querySelectorAll('#drogasOrigem input[type="checkbox"]'));
-        if(drogas.length){
-          const idx = drogas.indexOf('Outros');
-          if(idx!==-1 && $('drogasOrigemOutros').value.trim()) drogas[idx] = 'Outros: '+$('drogasOrigemOutros').value.trim();
-          parts.push('em uso de '+drogas.join(', '));
-        }
-        if(parts.length) origemFrase += ', ' + parts.join(', ');
-      }
-
-      let primeira = `${ident}`;
-      let segunda = '';
-      if(motivo || proc || origemFrase){
-        let p = [];
-        if(motivo) p.push(`história de ${motivo.toLowerCase()}`);
-        if(proc) p.push(`plano de ${proc.toLowerCase()}`);
-        if(origemFrase) p.push(origemFrase);
-        segunda = `${genderArticle()} foi levad${$('sexo').value==='feminino' ? 'a' : 'o'} ao centro cirúrgico com ${p.join(', ')}.`;
-      }
-      return [primeira, segunda].filter(Boolean).join('\n');
-    }
-
-    function gerarBackground(){
-      const asa = $('asa').value ? $('asa').value + ($('asaE').checked ? '-E' : '') : '';
-      const peso = $('peso').value ? $('peso').value + ' kg' : '';
-      const altura = $('altura').value ? $('altura').value + ' cm' : '';
-      const alergias = $('alergias').value.trim() || 'Nega alergias';
-      // comorb
-      let comorbidades = 'Nega comorbidades';
-      if(!$('semComorb').checked){
-        const arr = [];
-        document.querySelectorAll('#comorbidadesDiv input[type="checkbox"]').forEach(cb=>{
-          if(cb.checked && cb.value && cb.id!=='comorbOutrosChk' && cb.id!=='semComorb') arr.push(cb.value);
-        });
-        if($('comorbOutrosChk').checked && $('comorbOutrosTxt').value.trim()) arr.push('Outros: '+$('comorbOutrosTxt').value.trim());
-        if(arr.length) comorbidades = arr.join(', ');
-      }
-      const cirurgias = $('cirurgias').value.trim() || 'Nega cirurgias prévias';
-      const medicacoes = $('medicacoes').value.trim() || 'Nega medicações em uso';
-      const tipoCirc = $('tipoCirurgia').value ? ('Cirurgia de ' + $('tipoCirurgia').value + ' porte') : '';
-      const bgObs = $('bgObs').value.trim();
-
-      const lines = [];
-      lines.push('# B');
-      if(asa) lines.push(`${asa}.`);
-      if(peso || altura) lines.push(`Peso/Altura: ${peso||'n/i'} / ${altura||'n/i'}.`);
-      lines.push(`Comorbidades: ${comorbidades}.`);
-      lines.push(`Cirurgias prévias: ${cirurgias}.`);
-      lines.push(`Medicações em uso: ${medicacoes}.`);
-      lines.push(`Alergias: ${alergias}.`);
-      if(tipoCirc) lines.push(tipoCirc + '.');
-      if(bgObs) lines.push(bgObs + '.');
-      return lines.join('\n');
-    }
-
-    function gerarAvaliacao(){
-      // Indução / via aérea (omitida se jaIntubado OR foi intubado na origem)
-      let inducText = '';
-      const comesFromIntub = ( ($('origem').value==='uti' || $('origem').value==='emergencia') && $('chegaIntubado').checked );
-      if(!$('jaIntubado').checked && !comesFromIntub){
-        const device = $('deviceType').value;
-        const corm = $('cormack').value;
-        const tubo = $('tuboNum').value.trim();
-        const rima = $('rima').value;
-        const oroNaso = $('oroNaso').value === 'oro' ? 'orotraqueal' : 'nasotraqueal';
-        const aram = $('aramado').checked ? 'aramado' : 'não aramado';
-        const video = $('video').checked ? 'videolaringoscópio' : null;
-        const fibro = $('fibro').checked ? 'fibrobroncoscópio' : null;
-        const bougie = $('bougie').checked ? 'bougie' : null;
-        const vaDif = $('vaDificil').checked ? 'via aérea difícil' : null;
-        const ventDif = $('ventDificil').checked ? 'ventilação difícil' : null;
-        const indObs = $('inducaoObs').value.trim();
-        if(device==='ml'){
-          inducText = `Indução com máscara laríngea nº ${tubo}${indObs?', '+indObs:''}.`;
-        } else {
-          inducText = `Indução com intubação ${oroNaso}, tubo ${tubo ? tubo + ' mm' : 'nº não informado'}, Cormack ${corm}, rima ${rima ? rima + ' cm' : 'n/i'}, ${aram}${video?(', uso de '+video):''}${fibro?(', uso de '+fibro):''}${bougie?(', bougie') : ''}${vaDif?(', via aérea difícil'):''}${ventDif?(', ventilação difícil'):''}${indObs?'. '+indObs:''}.`;
-        }
-      } else {
-        // Patient already intubated - mention origin if applicable
-        if(comesFromIntub) inducText = `Paciente proveniente da ${$('origem').value==='uti'?'UTI':'Emergência'} já intubado e monitorizado.`;
-        else if($('jaIntubado').checked) inducText = 'Paciente já intubado previamente (dados de indução não aplicáveis).';
-      }
-
-      // Tipo de anestesia
-      const tipos = [];
-      if($('agBalanceada').checked) tipos.push('anestesia geral balanceada');
-      if($('tiva').checked) tipos.push('TIVA');
-      if($('sedacao').checked) tipos.push('sedação');
-      if($('combinada').checked){
-        const c = [];
-        if($('raqui').checked) c.push('raquianestesia');
-        if($('peridural').checked) c.push('peridural');
-        if($('bloqueioPerif').checked) c.push('bloqueio periférico');
-        if($('combOutrosChk').checked && $('combOutrosTxt').value.trim()) c.push('outros: '+$('combOutrosTxt').value.trim());
-        tipos.push('combinada' + (c.length?(' ('+c.join(', ')+')'):''));
-      }
-
-      // Monitorização
-      let monitor = [];
-      if($('monitorPadrao').checked) monitor = ['ECG','SpO₂','PNI','capnografia'];
-      if($('monTemp').checked) monitor.push('temperatura');
-      if($('monBIS').checked) monitor.push('BIS');
-      if($('monPVC').checked) monitor.push('PVC');
-      if($('monPAI').checked){
-        // remove PNI to avoid redundancy
-        monitor = monitor.filter(m=>m!=='PNI');
-        monitor.push('PAI');
-      }
-      if($('monOutrosChk').checked && $('monOutrosTxt').value.trim()) monitor.push('outros ('+$('monOutrosTxt').value.trim()+')');
-
-      const monitorTxt = monitor.length ? 'Monitorização: ' + monitor.join(', ') + '.' : '';
-
-      // Hemodinâmica
-      let hemoTxt = '';
-      if($('hemoEstavel').checked){
-        hemoTxt = 'Hemodinâmica: manteve-se estável hemodinamicamente durante o transoperatório, em ritmo sinusal, sem necessidade de drogas vasoativas.';
-      } else if($('hemoInstavel').checked){
-        // require at least one vasopressor if usoVaso checked (or if instável we require vaso)
-        const vasoUsed = $('usoVaso').checked;
-        const vasoList = [];
-        if(vasoUsed){
-          document.querySelectorAll('.vasoChk').forEach(cb=>{ if(cb.checked) vasoList.push(cb.value); });
-          if($('vasoOutrosChk').checked && $('vasoOutrosTxt').value.trim()) vasoList.push('Outros: '+$('vasoOutrosTxt').value.trim());
-        }
-        // If instable and usoVaso not checked and no vasoList, force validation later
-        const arr = $('hemoArritmia').checked ? 'arritmia' : '';
-        const outras = $('hemoOutrasChk').checked ? $('hemoObs').value.trim() : '';
-        const partes = [];
-        if(vasoUsed){
-          // special phrasing for efedrina/metaraminol bolus
-          const vasoBolus = vasoList.filter(v=> v === 'Efedrina' || v === 'Metaraminol');
-          const vasoCont = vasoList.filter(v=> v !== 'Efedrina' && v !== 'Metaraminol');
-          if(vasoBolus.length){
-            partes.push('episódios hipotensivos responsivos a bolus intermitente de ' + vasoBolus.join(' e '));
-          }
-          if(vasoCont.length){
-            partes.push('uso contínuo de ' + vasoCont.join(', '));
-          }
-        }
-        if(arr) partes.push('arritmia');
-        if(outras) partes.push(outras);
-        hemoTxt = partes.length ? ('Hemodinâmica instável: ' + partes.join('; ') + '.') : 'Hemodinâmica instável (detalhes não especificados).';
-      }
-
-      // Respiratório - VM details
-      let respTxt = '';
-      const respParts = [];
-      if($('respVM').checked){
-        // pull vm params
-        const modo = $('vmModo').value || 'VCV';
-        const vc = $('vmVc').value ? $('vmVc').value + ' mL' : 'Vc n/i';
-        const fr = $('vmFr').value ? $('vmFr').value : 'FR n/i';
-        const fio2 = $('vmFiO2').value || '0,5';
-        const peep = $('vmPeep').value ? $('vmPeep').value + ' cmH₂O' : 'PEEP n/i';
-        const ppico = $('vmPico').value ? $('vmPico').value + ' cmH₂O' : null;
-        const dp = $('vmDelta').value || '<15';
-        respTxt = `Respiratório: mantido em ventilação mecânica modo ${modo} (${vc}, FR ${fr}, FiO₂ ${fio2}, PEEP ${peep}${ppico?(', Ppico '+ppico):''}), dP ${dp}, com parâmetros otimizados.`;
-        if($('respInterc').value.trim()) respTxt += ' ' + $('respInterc').value.trim() + '.';
-      } else {
-        if($('respEspont').checked || $('respO2').checked){
-          const arr = [];
-          if($('respEspont').checked) arr.push('ventilação espontânea');
-          if($('respO2').checked) arr.push('suplementação de O₂');
-          respTxt = 'Respiratório: ' + arr.join(' e ') + '.';
-          if($('respInterc').value.trim()) respTxt += ' ' + $('respInterc').value.trim() + '.';
-        } else if($('respTraq').checked) {
-          respTxt = 'Respiratório: traqueostomizado.';
-        } else if($('respOutrosChk').checked && $('respInterc').value.trim()){
-          respTxt = 'Respiratório: ' + $('respInterc').value.trim() + '.';
-        }
-      }
-
-      // Renal
-      const aporte = $('aporteLiquidos').value ? $('aporteLiquidos').value + ' mL' : '';
-      const diurese = $('diurese').value ? $('diurese').value + ' mL' : '';
-      const renalTxt = (aporte || diurese) ? ('Renal: ' + [aporte ? ('Aporte ' + aporte) : '', diurese ? ('Diurese ' + diurese) : ''].filter(Boolean).join(', ') + '.') : '';
-
-      // Infeccioso
-      const atb = $('antibiotico').value.trim();
-      const rep = $('horarioRepique').value.trim();
-      let infTxt = '';
-      if(atb) infTxt = 'Antibiótico: ' + atb + (rep ? ' (repique: '+rep+')' : '') + ( $('infOutros').value.trim() ? '. ' + $('infOutros').value.trim() : '.' );
-      else if($('infOutros').value.trim()) infTxt = 'Infeccioso: ' + $('infOutros').value.trim() + '.';
-
-      // Hematológico
-      let hemTxt = '';
-      if($('transfusaoChk').checked){
-        const ch = $('qtyCH').value ? $('qtyCH').value+' CH' : '';
-        const pfc = $('qtyPFC').value ? $('qtyPFC').value+' PFC' : '';
-        const plaq = $('qtyPlaq').value ? $('qtyPlaq').value+' Plaquetas' : '';
-        const criop = $('qtyCriop').value ? $('qtyCriop').value+' Crioprecipitado' : '';
-        const outros = $('hemoOutrosTxt').value.trim();
-        const sang = $('sangramentoEstimado').value ? $('sangramentoEstimado').value + ' mL' : '';
-        const comps = [ch,pfc,plaq,criop].filter(Boolean);
-        if(outros) comps.push(outros);
-        hemTxt = 'Hematológico: transfundido com ' + (comps.length ? comps.join(', ') : 'hemocomponentes não especificados') + (sang ? (', sangramento estimado em ' + sang) : '') + '.';
-        if($('hemoObs').value.trim()) hemTxt += ' ' + $('hemoObs').value.trim() + '.';
-      } else {
-        hemTxt = 'Hematológico: sem hemocomponentes administrados.';
-      }
-
-      // Endocrino
-      const glic = $('glicemia').value.trim();
-      const endObs = $('endocrinoObs').value.trim();
-      const endoTxt = (glic ? 'Glicemia: ' + glic + ' mg/dL.' : '') + (endObs ? ' ' + endObs + '.' : '');
-
-      // Labs
-      const labs = $('labs').value.trim();
-      const labsTxt = labs ? 'Laboratoriais relevantes: ' + labs + (labs.endsWith('.') ? '' : '.') : '';
-
-      // Monta bloco A
-      const linhas = ['# A'];
-      if(inducText) linhas.push(inducText);
-      if(tipos.length) linhas.push('Submetido a ' + tipos.join(', ') + '.');
-      if(monitorTxt) linhas.push(monitorTxt);
-      if(hemoTxt) linhas.push(hemoTxt);
-      if(respTxt) linhas.push(respTxt);
-      if(renalTxt) linhas.push(renalTxt);
-      if(infTxt) linhas.push(infTxt);
-      if(hemTxt) linhas.push(hemTxt);
-      if(endoTxt) linhas.push(endoTxt);
-      if(labsTxt) linhas.push(labsTxt);
-
-      return linhas.join('\n');
-    }
-
-    function gerarRecomendacao(){
-      const transporte = [];
-      if($('monitorizacaoContinua').checked) transporte.push('monitorização contínua');
-      if($('usoVasoTransp').checked) transporte.push('uso de drogas vasoativas');
-      const sedR = join( Array.from(document.querySelectorAll('#sedacaoDiv input[type="checkbox"]')).filter(cb=>cb.checked).map(cb=>cb.value) );
-      const ventR = join( Array.from(document.querySelectorAll('#ventilacaoDiv input[type="checkbox"]')).filter(cb=>cb.checked).map(cb=>cb.value) );
-      const obs = $('observacoes').value.trim();
-
-      const linhas = ['# R'];
-      if(transporte.length) linhas.push('Transporte: ' + transporte.join(', ') + '.');
-      if(sedR) linhas.push('Sedação: ' + sedR + '.');
-      if(ventR) linhas.push('Ventilação: ' + ventR + '.');
-      if(obs) linhas.push('Observações: ' + obs);
-      return linhas.join('\n');
-    }
-
-    // Validator: if hemoInstavel -> require some vaso selected if usoVaso checked or at least some vaso if instable
-    function validateBeforeGenerate(){
-      if($('hemoInstavel').checked){
-        // require algum vaso ou arritmia/outros descritivos
-        const vasoChecked = $('usoVaso').checked && ( Array.from(document.querySelectorAll('.vasoChk')).some(cb=>cb.checked) || $('vasoOutrosChk').checked );
-        const arr = $('hemoArritmia').checked;
-        const outras = $('hemoOutrasChk').checked && $('hemoObs').value.trim();
-        if(!vasoChecked && !arr && !outras){
-          if(!confirm('Hemodinâmica marcada como instável mas sem vasopressores/arritmia/observações. Deseja continuar sem especificar vasopressores?')) return false;
-        }
-        // additionally, if instável and usoVaso checked, ensure at least one vaso is ticked
-        if($('usoVaso').checked && !vasoChecked){
-          alert('Por favor selecione ao menos um vasopressor (incluir Efedrina/Metaraminol se bolus).');
-          return false;
-        }
-      }
-      // If transfusão checked, require at least one qty or sangramento maybe optional; warn if none
-      if($('transfusaoChk').checked){
-        const anyQty = ($('qtyCH').value || $('qtyPFC').value || $('qtyPlaq').value || $('qtyCriop').value || $('hemoOutrosTxt').value.trim());
-        if(!anyQty){
-          if(!confirm('Transfusão marcada mas sem quantidades especificadas. Deseja continuar sem detalhar quantidades?')) return false;
-        }
-      }
-      return true;
-    }
-
-    // Main generator
-    let textoGerado = '';
-    function gerarSBAR(full=true){
-      if(!validateBeforeGenerate()) return;
-      const s = gerarSituacao();
-      const b = gerarBackground();
-      const a = gerarAvaliacao();
-      const r = gerarRecomendacao();
-      const all = [s, b, a, r].filter(Boolean).join('\n\n');
-
-      // polish text: ensure gender concordance (already basic), trim spaces
-      textoGerado = all;
-      $('resultado').textContent = textoGerado;
-      return textoGerado;
-    }
-
-    // Summary short version
-    function gerarResumoCurto(){
-      if(!validateBeforeGenerate()) return;
-      // pick key elements: ident, ASA, tipo anestesia, procedimento, hemodinâmica (stable/inst), ventilação summary
-      const nome = $('nome').value.trim() || 'Paciente';
-      const asa = $('asa').value ? $('asa').value + ($('asaE').checked ? '-E' : '') : 'ASA n/i';
-      const proc = $('procedimento').value.trim() || 'procedimento';
-      const tipos = [];
-      if($('agBalanceada').checked) tipos.push('anestesia geral balanceada');
-      if($('tiva').checked) tipos.push('TIVA');
-      if($('sedacao').checked) tipos.push('sedação');
-      if($('combinada').checked) tipos.push('combinada');
-      const tipoStr = tipos.length ? tipos.join(', ') : 'anestesia n/i';
-      const hemo = $('hemoEstavel').checked ? 'manteve-se estável hemodinamicamente' : 'apresentou instabilidade hemodinâmica';
-      // ventilation short
-      let ventShort = '';
-      if($('respVM').checked){
-        ventShort = `VM ${$('vmModo').value || 'VCV'}, Vc ${$('vmVc').value||'n/i'} mL, FR ${$('vmFr').value||'n/i'}.`;
-      } else if($('respEspont').checked){
-        ventShort = 'ventilação espontânea com suplementação de O₂';
-      }
-      const resumo = `${nome} — ${asa} — submetid${$('sexo').value==='feminino'?'a':'o'} a ${tipoStr} para ${proc}. ${hemo}. ${ventShort}`;
-      $('resultado').textContent = resumo;
-      textoGerado = resumo;
-    }
-
-    // Copy / PDF / Novo
-    function copiarTexto(){
-      if(!textoGerado){ alert('Gere o relatório primeiro.'); return; }
-      navigator.clipboard.writeText(textoGerado).then(()=>alert('Relatório copiado!')).catch(()=>alert('Erro ao copiar.'));
-    }
-
-    async function gerarPDF(){
-      if(!textoGerado){ alert('Gere o relatório primeiro.'); return; }
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({unit:'mm', format:'a4'});
-      doc.setFont('helvetica','normal'); doc.setFontSize(11);
-      const lines = doc.splitTextToSize(textoGerado, 180);
-      doc.text(lines, 15, 20);
-      doc.save('relatorio-sbar-anestesia.pdf');
-    }
-
-    function novoCaso(){
-      if(!confirm('Limpar todos os campos e iniciar novo caso?')) return;
-      document.querySelectorAll('input,select,textarea').forEach(el=>{
-        if(el.type==='checkbox' || el.type==='radio') el.checked = false;
-        else el.value = '';
-      });
-      // reset some defaults
-      $('monitorPadrao').checked = true;
-      $('hemoEstavel').checked = true;
-      setDefaultsBySex();
-      hide('origemDetalhes'); hide('transfusaoDetalhes'); hide('hemoInstDetalhes'); hide('vasoDetalhes'); hide('vmParams'); hide('combinadaOpcoes'); hide('comorbOutrosTxt'); hide('drogasOrigemOutros'); hide('monOutrosTxt'); hide('inducaoCampos');
-      textoGerado = ''; $('resultado').textContent = '';
-    }
-
-    // Button bindings
-    document.addEventListener('DOMContentLoaded', ()=>{
-      initUI();
-      $('btnGerar').addEventListener('click', ()=>gerarSBAR(true));
-      $('btnResumoCurto').addEventListener('click', gerarResumoCurto);
-      $('btnCopiar').addEventListener('click', copiarTexto);
-      $('btnPDF').addEventListener('click', gerarPDF);
-      $('btnNovo').addEventListener('click', novoCaso);
-    });
-  </script>
+<div class="container">
+<header>
+<h1>📋 SBAR Anestesia</h1>
+<div class="subtitle">Gerador de passagem de plantão intraoperatório</div>
+</header>
+
+<details open class="card">
+<summary><span class="badge success">S</span> Situação</summary>
+<div class="section-content">
+<div class="grid">
+<div class="field"><label>Nome do paciente</label><input type="text" id="nome" placeholder="Ex: João Silva"/></div>
+<div class="field"><label>Sexo e Idade</label><div class="inline"><select id="sexo"><option value="">Sexo</option><option value="masculino">Masculino</option><option value="feminino">Feminino</option></select><input type="number" id="idade" placeholder="Idade" min="0" max="120"/></div></div>
+</div>
+<div class="grid">
+<div class="field"><label>Motivo da internação</label><input type="text" id="motivo" placeholder="Ex: Apendicite aguda"/></div>
+<div class="field"><label>Procedimento realizado</label><input type="text" id="procedimento" placeholder="Ex: Apendicectomia videolaparoscópica"/></div>
+</div>
+<div class="grid">
+<div class="field"><label>Origem do paciente</label><select id="origem"><option value="">Selecione</option><option value="emergencia">Emergência</option><option value="enfermaria">Enfermaria</option><option value="uti">UTI</option></select></div>
+<div class="field"><label>Porte cirúrgico</label><select id="tipoCirurgia"><option value="">Selecione</option><option value="pequeno">Pequeno</option><option value="medio">Médio</option><option value="grande">Grande</option></select></div>
+</div>
+<div id="origemDetalhes" style="display:none" class="subsection">
+<label>Condições de chegada</label>
+<div class="checkbox-group">
+<label class="checkbox-label"><input type="checkbox" id="chegaIntubado"/> Intubado</label>
+<label class="checkbox-label"><input type="checkbox" id="chegaMonitorizado"/> Monitorizado</label>
+<label class="checkbox-label"><input type="checkbox" id="chegaVM"/> Em VM</label>
+</div>
+<div class="divider"></div>
+<label>Drogas vasoativas (origem)</label>
+<div class="checkbox-group">
+<label class="checkbox-label"><input type="checkbox" value="Noradrenalina" class="drogaOrigem"/> Noradrenalina</label>
+<label class="checkbox-label"><input type="checkbox" value="Vasopressina" class="drogaOrigem"/> Vasopressina</label>
+<label class="checkbox-label"><input type="checkbox" value="Dobutamina" class="drogaOrigem"/> Dobutamina</label>
+<label class="checkbox-label"><input type="checkbox" id="drogasOrigemOutrosChk"/> Outros</label>
+</div>
+<input type="text" id="drogasOrigemOutros" style="display:none;margin-top:10px" placeholder="Especifique"/>
+</div>
+</div>
+</details>
+
+<details class="card" open>
+<summary><span class="badge info">B</span> Background</summary>
+<div class="section-content">
+<div class="grid">
+<div class="field"><label>Classificação ASA</label><div class="inline"><select id="asa"><option value="">ASA</option><option>ASA I</option><option>ASA II</option><option>ASA III</option><option>ASA IV</option><option>ASA V</option></select><label class="checkbox-label"><input type="checkbox" id="asaE"/> E</label></div></div>
+<div class="field"><label>Peso e Altura</label><div class="inline"><input type="number" id="peso" placeholder="kg" min="0" step="0.1"/><input type="number" id="altura" placeholder="cm" min="0"/></div></div>
+</div>
+<div class="field"><label>Comorbidades</label><div class="checkbox-group">
+<label class="checkbox-label"><input type="checkbox" value="HAS" class="comorb"/> HAS</label>
+<label class="checkbox-label"><input type="checkbox" value="DM" class="comorb"/> DM</label>
+<label class="checkbox-label"><input type="checkbox" value="DAC" class="comorb"/> DAC</label>
+<label class="checkbox-label"><input type="checkbox" value="DPOC" class="comorb"/> DPOC</label>
+<label class="checkbox-label"><input type="checkbox" value="DRC" class="comorb"/> DRC</label>
+<label class="checkbox-label"><input type="checkbox" id="comorbOutrosChk"/> Outras</label>
+<label class="checkbox-label"><input type="checkbox" id="semComorb"/> Sem comorbidades</label>
+</div>
+<input type="text" id="comorbOutrosTxt" style="display:none;margin-top:10px" placeholder="Especifique"/>
+</div>
+<div class="grid">
+<div class="field"><label>Alergias</label><input type="text" id="alergias" placeholder="Ex: Dipirona"/></div>
+<div class="field"><label>Cirurgias prévias</label><input type="text" id="cirurgias" placeholder="Ex: Colecistectomia"/></div>
+</div>
+<div class="field"><label>Medicações de uso habitual</label><input type="text" id="medicacoes" placeholder="Ex: Losartana 50mg"/></div>
+</div>
+</details>
+
+<details class="card" open>
+<summary><span class="badge warning">A</span> Avaliação</summary>
+<div class="section-content">
+<div class="subsection" id="inducaoCampos">
+<label><strong>Indução e Via Aérea</strong></label>
+<div class="grid">
+<div class="field"><label>Dispositivo</label><select id="deviceType"><option value="tubo">Tubo oro/nasotraqueal</option><option value="ml">Máscara laríngea</option><option value="traq">Traqueostomia</option></select></div>
+<div class="field"><label>Cormack-Lehane</label><select id="cormack"><option value="I">I</option><option value="IIa">IIa</option><option value="IIb">IIb</option><option value="IIIa">IIIa</option><option value="IIIb">IIIb</option><option value="IV">IV</option></select></div>
+</div>
+<div class="grid-3">
+<input type="text" id="tuboNum" placeholder="Nº tubo/ML"/>
+<input type="number" id="rima" placeholder="Rima (cm)" min="10" max="30"/>
+<select id="oroNaso"><option value="oro">Oro</option><option value="naso">Naso</option></select>
+</div>
+<div class="checkbox-group">
+<label class="checkbox-label"><input type="checkbox" id="aramado"/> Aramado</label>
+<label class="checkbox-label"><input type="checkbox" id="video"/> Videolaringoscópio</label>
+<label class="checkbox-label"><input type="checkbox" id="bougie"/> Bougie</label>
+<label class="checkbox-label"><input type="checkbox" id="vaDificil"/> Via aérea difícil</label>
+</div>
+<input type="text" id="inducaoObs" placeholder="Intercorrências" style="margin-top:10px"/>
+</div>
+
+<div class="divider"></div>
+
+<div class="field"><label><strong>Técnica Anestésica</strong></label>
+<div class="checkbox-group">
+<label class="checkbox-label"><input type="checkbox" id="agBalanceada"/> AG balanceada</label>
+<label class="checkbox-label"><input type="checkbox" id="tiva"/> TIVA</label>
+<label class="checkbox-label"><input type="checkbox" id="sedacao"/> Sedação</label>
+<label class="checkbox-label"><input type="checkbox" id="bloqueioNeuro"/> Neuroeixo</label>
+</div>
+<div id="neuroeixoOpcoes" style="display:none" class="subsection">
+<div class="checkbox-group">
+<label class="checkbox-label"><input type="checkbox" id="raqui"/> Raquianestesia</label>
+<label class="checkbox-label"><input type="checkbox" id="peridural"/> Peridural</label>
+</div>
+<div id="raquiDetalhes" style="display:none;margin-top:10px">
+<div class="grid-3"><input type="text" id="raquiNivel" placeholder="Nível"/><input type="text" id="raquiAgulha" placeholder="Agulha"/><input type="text" id="raquiMed" placeholder="Medicamento"/></div>
+<input type="text" id="raquiDose" placeholder="Dose" style="margin-top:8px"/>
+</div>
+<div id="periduralDetalhes" style="display:none;margin-top:10px">
+<div class="grid-3"><input type="text" id="periduralNivel" placeholder="Nível"/><input type="text" id="periduralAgulha" placeholder="Agulha"/><input type="text" id="periduralMed" placeholder="Medicamento"/></div>
+<div class="inline" style="margin-top:8px"><input type="text" id="periduralDose" placeholder="Dose"/><label class="checkbox-label"><input type="checkbox" id="periduralCateter"/> Cateter</label></div>
+<input type="text" id="periduralObs" placeholder="Obs cateter" style="margin-top:8px"/>
+</div>
+</div>
+</div>
+
+<div class="divider"></div>
+
+<div class="field"><label><strong>Analgesia</strong></label>
+<div class="subsection"><label>Venosa</label><div class="checkbox-group">
+<label class="checkbox-label"><input type="checkbox" value="Dipirona" class="analgVen"/> Dipirona</label>
+<label class="checkbox-label"><input type="checkbox" value="Morfina" class="analgVen"/> Morfina</label>
+<label class="checkbox-label"><input type="checkbox" value="Metadona" class="analgVen"/> Metadona</label>
+<label class="checkbox-label"><input type="checkbox" value="Clonidina" class="analgVen"/> Clonidina</label>
+<label class="checkbox-label"><input type="checkbox" value="Dexmedetomidina" class="analgVen"/> Dexmedetomidina</label>
+<label class="checkbox-label"><input type="checkbox" value="Cetamina" class="analgVen"/> Cetamina</label>
+<label class="checkbox-label"><input type="checkbox" value="Magnésio" class="analgVen"/> Magnésio</label>
+<label class="checkbox-label"><input type="checkbox" id="analgVenOutros"/> Outros</label>
+</div>
+<input type="text" id="analgVenOutrosTxt" style="display:none;margin-top:8px" placeholder="Especifique"/>
+</div>
+<div class="subsection"><label class="checkbox-label"><input type="checkbox" id="analgPeridural"/> Peridural</label>
+<div id="analgPeriduralDet" style="display:none;margin-top:8px">
+<div class="grid-3"><input type="text" id="analgPeriduralDose" placeholder="Dose"/><input type="text" id="analgPeriduralNivel" placeholder="Nível"/><label class="checkbox-label"><input type="checkbox" id="analgPeriduralCat"/> Cateter</label></div>
+</div>
+</div>
+<div class="subsection"><label class="checkbox-label"><input type="checkbox" id="analgRaqui"/> Raquianestesia</label>
+<div id="analgRaquiDet" style="display:none;margin-top:8px">
+<div class="checkbox-group">
+<label class="checkbox-label"><input type="checkbox" value="Morfina" class="analgRaquiAdj"/> Morfina</label>
+<label class="checkbox-label"><input type="checkbox" id="analgRaquiOutros"/> Outros</label>
+</div>
+<input type="text" id="analgRaquiOutrosTxt" style="display:none;margin-top:8px" placeholder="Adjuvantes"/>
+</div>
+</div>
+<div class="subsection"><label class="checkbox-label"><input type="checkbox" id="analgBloqPerif"/> Bloqueio periférico</label>
+<input type="text" id="analgBloqPerifTxt" style="display:none;margin-top:8px" placeholder="Qual bloqueio"/>
+</div>
+</div>
+
+<div class="divider"></div>
+
+<div class="field"><label><strong>Monitorização</strong></label>
+<label class="checkbox-label"><input type="checkbox" id="monitorPadrao" checked/> Padrão (ECG, SpO₂, PNI, capnografia)</label>
+<div class="checkbox-group" style="margin-top:8px">
+<label class="checkbox-label"><input type="checkbox" id="monTemp"/> Temperatura</label>
+<label class="checkbox-label"><input type="checkbox" id="monPAI"/> PAI</label>
+<label class="checkbox-label"><input type="checkbox" id="monPVC"/> PVC</label>
+<label class="checkbox-label"><input type="checkbox" id="monBIS"/> BIS</label>
+<label class="checkbox-label"><input type="checkbox" id="monOutrosChk"/> Outros</label>
+</div>
+<input type="text" id="monOutrosTxt" style="display:none;margin-top:8px" placeholder="Especifique"/>
+</div>
+
+<div class="divider"></div>
+
+<div class="field"><label><strong>Hemodinâmica</strong></label>
+<div class="checkbox-group">
+<label class="checkbox-label"><input type="checkbox" id="hemoEstavel" checked/> Estável</label>
+<label class="checkbox-label"><input type="checkbox" id="hemoInstavel"/> Instável</label>
+</div>
+<div id="hemoInstDet" style="display:none" class="subsection">
+<div class="checkbox-group">
+<label class="checkbox-label"><input type="checkbox" id="usoVaso"/> Drogas vasoativas</label>
+<label class="checkbox-label"><input type="checkbox" id="hemoArritmia"/> Arritmia</label>
+</div>
+<div id="vasoDet" style="display:none;margin-top:10px">
+<div class="checkbox-group">
+<label class="checkbox-label"><input type="checkbox" value="Noradrenalina" class="vasoChk"/> Noradrenalina</label>
+<label class="checkbox-label"><input type="checkbox" value="Vasopressina" class="vasoChk"/> Vasopressina</label>
+<label class="checkbox-label"><input type="checkbox" value="Dobutamina" class="vasoChk"/> Dobutamina</label>
+<label class="checkbox-label"><input type="checkbox" value="Nitroglicerina" class="vasoChk"/> Nitroglicerina</label>
+<label class="checkbox-label"><input type="checkbox" value="Nitroprussiato" class="vasoChk"/> Nitroprussiato</label>
+<label class="checkbox-label"><input type="checkbox" id="vasoOutrosChk"/> Outros</label>
+</div>
+<input type="text" id="vasoOutrosTxt" style="display:none;margin-top:8px" placeholder="Especifique"/>
+<label style="margin-top:10px">Doses (mcg/kg/min)</label>
+<div class="grid-3">
+<input type="number" id="doseNorad" placeholder="Norad" step="0.01" min="0"/>
+<input type="number" id="doseVasop" placeholder="Vasop" step="0.01" min="0"/>
+<input type="number" id="doseDobu" placeholder="Dobu" step="0.1" min="0"/>
+<input type="number" id="doseNitro" placeholder="Nitro" step="0.01" min="0"/>
+<input type="number" id="doseNitrop" placeholder="Nitrop" step="0.01" min="0"/>
+</div>
+</div>
+<input type="text" id="hemoObs" placeholder="Observações" style="margin-top:10px"/>
+</div>
+</div>
+
+<div class="divider"></div>
+
+<div class="field"><label><strong>Respiratório</strong></label>
+<div class="checkbox-group">
+<label class="checkbox-label"><input type="checkbox" id="respVM"/> VM</label>
+<label class="checkbox-label"><input type="checkbox" id="respEspont"/> Espontâneo</label>
+<label class="checkbox-label"><input type="checkbox" id="respO2"/> O₂ suplementar</label>
+<label class="checkbox-label"><input type="checkbox" id="respTraq"/> Traqueostomia</label>
+</div>
+<div id="vmParams" style="display:none" class="subsection">
+<div class="grid-3">
+<select id="vmModo"><option value="VCV">VCV</option><option value="PCV">PCV</option><option value="PS">PS</option></select>
+<input type="number" id="vmVc" placeholder="Vc (mL)" min="0"/>
+<input type="number" id="vmFr" placeholder="FR" min="0"/>
+</div>
+<div class="grid-3" style="margin-top:8px">
+<input type="text" id="vmFiO2" placeholder="FiO₂"/>
+<input type="number" id="vmPeep" placeholder="PEEP" min="0"/>
+<input type="text" id="vmDelta" placeholder="ΔP"/>
+</div>
+<input type="text" id="respInterc" placeholder="Observações" style="margin-top:8px"/>
+</div>
+</div>
+
+<div class="divider"></div>
+
+<div class="grid">
+<div class="field"><label><strong>Aporte (mL)</strong></label><input type="number" id="aporteLiquidos" placeholder="2000" min="0"/></div>
+<div class="field"><label><strong>Diurese (mL)</strong></label><input type="number" id="diurese" placeholder="500" min="0"/></div>
+</div>
+
+<div class="divider"></div>
+
+<div class="field"><label><strong>Antibiótico</strong></label>
+<div class="grid">
+<input type="text" id="antibiotico" placeholder="Nome"/>
+<input type="text" id="horarioRepique" placeholder="Repique"/>
+</div>
+</div>
+
+<div class="divider"></div>
+
+<div class="field"><label><strong>Hematológico</strong></label>
+<div class="grid">
+<div class="field"><label>Sangramento estimado (mL)</label><input type="number" id="sangramentoEst" placeholder="Ex: 500" min="0"/></div>
+<div class="field" style="display:flex;align-items:center;margin-top:24px"><label class="checkbox-label"><input type="checkbox" id="sangramentoNM"/> Não mensurável</label></div>
+</div>
+<label class="checkbox-label" style="margin-top:10px"><input type="checkbox" id="transfusaoChk"/> Transfusão realizada</label>
+<div id="transfusaoDet" style="display:none" class="subsection">
+<div class="grid-3">
+<input type="number" id="qtyCH" placeholder="CH (un)" min="0"/>
+<input type="number" id="qtyPFC" placeholder="PFC (un)" min="0"/>
+<input type="number" id="qtyPlaq" placeholder="Plaquetas (un)" min="0"/>
+</div>
+</div>
+</div>
+
+<div class="divider"></div>
+
+<div class="grid">
+<div class="field"><label><strong>Glicemia (mg/dL)</strong></label><input type="text" id="glicemia" placeholder="120"/></div>
+<div class="field"><label><strong>Labs relevantes</strong></label><input type="text" id="labs" placeholder="Ex: Hb 10,5"/></div>
+</div>
+</div>
+</details>
+
+<details class="card" open>
+<summary><span class="badge success">R</span> Recomendação</summary>
+<div class="section-content">
+<div class="grid">
+<div class="field"><label>Transporte</label><div class="checkbox-group">
+<label class="checkbox-label"><input type="checkbox" id="monitContinua"/> Monitorização contínua</label>
+<label class="checkbox-label"><input type="checkbox" id="usoVasoTransp"/> Drogas vasoativas</label>
+</div></div>
+<div class="field"><label>Sedação</label><div class="checkbox-group">
+<label class="checkbox-label"><input type="checkbox" value="Sedado" class="sedacao"/> Sedado</label>
+<label class="checkbox-label"><input type="checkbox" value="Despertando" class="sedacao"/> Despertando</label>
+<label class="checkbox-label"><input type="checkbox" value="Acordado" class="sedacao"/> Acordado</label>
+</div></div>
+</div>
+<div class="field"><label>Ventilação</label><div class="checkbox-group">
+<label class="checkbox-label"><input type="checkbox" value="VM" class="ventilacao"/> VM</label>
+<label class="checkbox-label"><input type="checkbox" value="Espontânea" class="ventilacao"/> Espontânea</label>
+<label class="checkbox-label"><input type="checkbox" value="O₂ suplementar" class="ventilacao"/> O₂ suplementar</label>
+</div></div>
+<div class="field"><label>Observações/Recomendações</label><textarea id="observacoes" placeholder="Cuidados especiais..."></textarea></div>
+<div class="actions">
+<button class="primary" id="btnGerar">📄 Gerar Relatório</button>
+<button class="secondary" id="btnCopiar">📋 Copiar</button>
+<button class="secondary" id="btnPDF">🖨️ PDF</button>
+<button class="secondary" id="btnNovo">🔄 Novo</button>
+</div>
+</div>
+</details>
+
+<h2 style="margin:20px 0 12px">📋 Relatório</h2>
+<div id="resultado" class="card"><div class="resultado-vazio">Clique em "Gerar Relatório"</div></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const show=el=>{if(el)el.style.display='block'};
+const hide=el=>{if(el)el.style.display='none'};
+const checked=id=>$(id)?.checked||false;
+const val=id=>$(id)?.value?.trim()||'';
+let textoGerado='';
+
+function initUI(){
+$('origem').addEventListener('change',()=>{const v=val('origem');(v==='uti'||v==='emergencia')?show($('origemDetalhes')):hide($('origemDetalhes'))});
+$('drogasOrigemOutrosChk').addEventListener('change',e=>e.target.checked?show($('drogasOrigemOutros')):hide($('drogasOrigemOutros')));
+$('semComorb').addEventListener('change',e=>{if(e.target.checked)document.querySelectorAll('.comorb').forEach(cb=>cb.checked=false)});
+$('comorbOutrosChk').addEventListener('change',e=>e.target.checked?show($('comorbOutrosTxt')):hide($('comorbOutrosTxt')));
+$('bloqueioNeuro').addEventListener('change',e=>e.target.checked?show($('neuroeixoOpcoes')):hide($('neuroeixoOpcoes')));
+$('raqui').addEventListener('change',e=>e.target.checked?show($('raquiDetalhes')):hide($('raquiDetalhes')));
+$('peridural').addEventListener('change',e=>e.target.checked?show($('periduralDetalhes')):hide($('periduralDetalhes')));
+$('analgVenOutros').addEventListener('change',e=>e.target.checked?show($('analgVenOutrosTxt')):hide($('analgVenOutrosTxt')));
+$('analgPeridural').addEventListener('change',e=>e.target.checked?show($('analgPeriduralDet')):hide($('analgPeriduralDet')));
+$('analgRaqui').addEventListener('change',e=>e.target.checked?show($('analgRaquiDet')):hide($('analgRaquiDet')));
+$('analgRaquiOutros').addEventListener('change',e=>e.target.checked?show($('analgRaquiOutrosTxt')):hide($('analgRaquiOutrosTxt')));
+$('analgBloqPerif').addEventListener('change',e=>e.target.checked?show($('analgBloqPerifTxt')):hide($('analgBloqPerifTxt')));
+$('monOutrosChk').addEventListener('change',e=>e.target.checked?show($('monOutrosTxt')):hide($('monOutrosTxt')));
+$('hemoInstavel').addEventListener('change',e=>{if(e.target.checked){show($('hemoInstDet'));$('hemoEstavel').checked=false}else hide($('hemoInstDet'))});
+$('hemoEstavel').addEventListener('change',e=>{if(e.target.checked){$('hemoInstavel').checked=false;hide($('hemoInstDet'))}});
+$('usoVaso').addEventListener('change',e=>e.target.checked?show($('vasoDet')):hide($('vasoDet')));
+$('vasoOutrosChk').addEventListener('change',e=>e.target.checked?show($('vasoOutrosTxt')):hide($('vasoOutrosTxt')));
+$('respVM').addEventListener('change',e=>e.target.checked?show($('vmParams')):hide($('vmParams')));
+$('transfusaoChk').addEventListener('change',e=>e.target.checked?show($('transfusaoDet')):hide($('transfusaoDet')));
+setDefaults();
+}
+
+function setDefaults(){
+if($('monitorPadrao'))$('monitorPadrao').checked=true;
+if($('hemoEstavel'))$('hemoEstavel').checked=true;
+if($('vmVc')&&!val('vmVc'))$('vmVc').value=500;
+if($('vmFr')&&!val('vmFr'))$('vmFr').value=12;
+if($('vmFiO2')&&!val('vmFiO2'))$('vmFiO2').value='0,5';
+if($('vmPeep')&&!val('vmPeep'))$('vmPeep').value=5;
+if($('vmDelta')&&!val('vmDelta'))$('vmDelta').value='<15';
+if($('cormack')&&!val('cormack'))$('cormack').value='I';
+if($('rima')&&!val('rima'))$('rima').value=20;
+}
+
+function artigo(){return val('sexo')==='feminino'?'A paciente':'O paciente'}
+function participio(v){return val('sexo')==='feminino'?v+'a':v+'o'}
+
+function gerarSituacao(){
+const nome=val('nome')||'Paciente';
+const sexo=val('sexo');
+const idade=val('idade')?', '+val('idade')+' anos':'';
+const sexoTxt=sexo?', sexo '+sexo:'';
+const ident=nome+idade+sexoTxt;
+const motivo=val('motivo');
+const proc=val('procedimento');
+const origem=val('origem');
+let origemTxt='';
+if(origem==='emergencia')origemTxt='proveniente do setor de emergência';
+if(origem==='enfermaria')origemTxt='proveniente da enfermaria';
+if(origem==='uti')origemTxt='proveniente da UTI';
+if(origem==='uti'||origem==='emergencia'){
+const conds=[];
+if(checked('chegaIntubado'))conds.push('intubado');
+if(checked('chegaVM'))conds.push('em ventilação mecânica');
+if(checked('chegaMonitorizado'))conds.push('monitorizado');
+const drogas=[];
+document.querySelectorAll('.drogaOrigem:checked').forEach(cb=>drogas.push(cb.value.toLowerCase()));
+if(checked('drogasOrigemOutrosChk')&&val('drogasOrigemOutros'))drogas.push(val('drogasOrigemOutros').toLowerCase());
+if(drogas.length)conds.push('em uso de '+drogas.join(', '));
+if(conds.length)origemTxt+=', '+conds.join(', ');
+}
+let texto=ident;
+const detalhes=[];
+if(motivo)detalhes.push('internado por '+motivo.toLowerCase());
+if(proc)detalhes.push('submetido a '+proc.toLowerCase());
+if(origemTxt)detalhes.push(origemTxt);
+if(detalhes.length)texto+=', '+detalhes.join(', ')+'.';else texto+='.';
+return texto;
+}
+
+function gerarBackground(){
+const lines=[];
+const asa=val('asa');
+if(asa)lines.push(asa+(checked('asaE')?'E':'')+'.');
+const peso=val('peso');
+const altura=val('altura');
+if(peso||altura)lines.push('Peso: '+(peso?peso+' kg':'não informado')+', Altura: '+(altura?altura+' cm':'não informada')+'.');
+if(checked('semComorb')){lines.push('Nega comorbidades.')}else{
+const comorbs=[];
+document.querySelectorAll('.comorb:checked').forEach(cb=>comorbs.push(cb.value));
+if(checked('comorbOutrosChk')&&val('comorbOutrosTxt'))comorbs.push(val('comorbOutrosTxt'));
+if(comorbs.length)lines.push('Comorbidades: '+comorbs.join(', ')+'.');else lines.push('Nega comorbidades.');
+}
+const alerg=val('alergias');
+lines.push(alerg?'Alergias: '+alerg+'.':'Nega alergias.');
+const cirurg=val('cirurgias');
+lines.push(cirurg?'Cirurgias prévias: '+cirurg+'.':'Nega cirurgias prévias.');
+const meds=val('medicacoes');
+lines.push(meds?'Medicações em uso: '+meds+'.':'Nega medicações de uso contínuo.');
+const porte=val('tipoCirurgia');
+if(porte)lines.push('Cirurgia de '+porte+' porte.');
+return lines.join('\n');
+}
+
+function gerarAvaliacao(){
+const lines=[];
+const veioIntubado=(val('origem')==='uti'||val('origem')==='emergencia')&&checked('chegaIntubado');
+if(!veioIntubado){
+const device=val('deviceType');
+const corm=val('cormack');
+const tubo=val('tuboNum');
+const rima=val('rima');
+const oroNaso=val('oroNaso')==='oro'?'orotraqueal':'nasotraqueal';
+const aram=checked('aramado')?'aramado':'não aramado';
+const extras=[];
+if(checked('video'))extras.push('videolaringoscópio');
+if(checked('bougie'))extras.push('bougie');
+if(checked('vaDificil'))extras.push('via aérea difícil');
+if(device==='ml'){
+lines.push('Indução anestésica com máscara laríngea nº '+(tubo||'não informado')+(extras.length?', com uso de '+extras.join(', '):'')+'.');
+}else if(device==='traq'){
+lines.push('Paciente traqueostomizado.');
+}else{
+lines.push('Indução anestésica com intubação '+oroNaso+', tubo '+(tubo?'nº '+tubo:'não informado')+', Cormack-Lehane '+corm+', rima glótica '+(rima?rima+' cm':'não informada')+', tubo '+aram+(extras.length?', com uso de '+extras.join(', '):'')+'.');
+}
+const obs=val('inducaoObs');
+if(obs)lines.push(obs+'.');
+}else{
+lines.push('Paciente admitido já intubado proveniente da '+(val('origem')==='uti'?'UTI':'emergência')+'.');
+}
+const tipos=[];
+if(checked('agBalanceada'))tipos.push('anestesia geral balanceada com sevoflurano');
+if(checked('tiva'))tipos.push('anestesia venosa total');
+if(checked('sedacao'))tipos.push('sedação');
+const neuro=[];
+if(checked('raqui')){
+const nivel=val('raquiNivel');
+const agulha=val('raquiAgulha');
+const med=val('raquiMed');
+const dose=val('raquiDose');
+neuro.push('raquianestesia'+(nivel?' em '+nivel:'')+(agulha?' com agulha '+agulha:'')+(med?', '+med:'')+(dose?' '+dose:''));
+}
+if(checked('peridural')){
+const nivel=val('periduralNivel');
+const agulha=val('periduralAgulha');
+const med=val('periduralMed');
+const dose=val('periduralDose');
+const cat=checked('periduralCateter');
+neuro.push('peridural'+(nivel?' em '+nivel:'')+(agulha?' com agulha '+agulha:'')+(med?', '+med:'')+(dose?' '+dose:'')+(cat?', com passagem de cateter':''));
+const obsPerid=val('periduralObs');
+if(obsPerid)neuro.push(obsPerid);
+}
+if(checked('bloqueioNeuro')&&neuro.length){
+tipos.push('bloqueio de neuroeixo ('+neuro.join('; ')+')');
+}
+if(tipos.length)lines.push('Realizada '+tipos.join(' associada a ')+'.');
+const analg=[];
+const analgVen=[];
+document.querySelectorAll('.analgVen:checked').forEach(cb=>analgVen.push(cb.value.toLowerCase()));
+if(checked('analgVenOutros')&&val('analgVenOutrosTxt'))analgVen.push(val('analgVenOutrosTxt').toLowerCase());
+if(analgVen.length)analg.push('analgesia venosa com '+analgVen.join(', '));
+if(checked('analgPeridural')){
+const dose=val('analgPeriduralDose');
+const nivel=val('analgPeriduralNivel');
+const cat=checked('analgPeriduralCat');
+analg.push('analgesia peridural'+(dose?' '+dose:'')+(nivel?' em '+nivel:'')+(cat?' com cateter':''));
+}
+if(checked('analgRaqui')){
+const adj=[];
+document.querySelectorAll('.analgRaquiAdj:checked').forEach(cb=>adj.push(cb.value.toLowerCase()));
+if(checked('analgRaquiOutros')&&val('analgRaquiOutrosTxt'))adj.push(val('analgRaquiOutrosTxt').toLowerCase());
+if(adj.length)analg.push('analgesia em raquianestesia com '+adj.join(', '));
+}
+if(checked('analgBloqPerif')&&val('analgBloqPerifTxt')){
+analg.push(val('analgBloqPerifTxt').toLowerCase());
+}
+if(analg.length)lines.push('Analgesia: '+analg.join(', ')+'.');
+const monitor=[];
+if(checked('monitorPadrao')){
+monitor.push('ECG','SpO₂','capnografia');
+if(!checked('monPAI'))monitor.push('PNI');
+}
+if(checked('monTemp'))monitor.push('temperatura');
+if(checked('monPAI'))monitor.push('PAI');
+if(checked('monPVC'))monitor.push('PVC');
+if(checked('monBIS'))monitor.push('BIS');
+if(checked('monOutrosChk')&&val('monOutrosTxt'))monitor.push(val('monOutrosTxt'));
+if(monitor.length)lines.push('Monitorização: '+monitor.join(', ')+'.');
+if(checked('hemoEstavel')){
+lines.push('Manteve-se hemodinamicamente estável durante o intraoperatório, sem necessidade de drogas vasoativas.');
+}else if(checked('hemoInstavel')){
+const detalhes=[];
+if(checked('usoVaso')){
+const vasos=[];
+document.querySelectorAll('.vasoChk:checked').forEach(cb=>{
+const vaso=cb.value;
+let dose='';
+if(vaso==='Noradrenalina'&&val('doseNorad'))dose=' '+val('doseNorad')+' mcg/kg/min';
+if(vaso==='Vasopressina'&&val('doseVasop'))dose=' '+val('doseVasop')+' mcg/kg/min';
+if(vaso==='Dobutamina'&&val('doseDobu'))dose=' '+val('doseDobu')+' mcg/kg/min';
+if(vaso==='Nitroglicerina'&&val('doseNitro'))dose=' '+val('doseNitro')+' mcg/kg/min';
+if(vaso==='Nitroprussiato'&&val('doseNitrop'))dose=' '+val('doseNitrop')+' mcg/kg/min';
+vasos.push(vaso.toLowerCase()+dose);
+});
+if(checked('vasoOutrosChk')&&val('vasoOutrosTxt'))vasos.push(val('vasoOutrosTxt').toLowerCase());
+if(vasos.length)detalhes.push('uso de '+vasos.join(', '));
+}
+if(checked('hemoArritmia'))detalhes.push('episódios de arritmia');
+const obsHemo=val('hemoObs');
+if(obsHemo)detalhes.push(obsHemo.toLowerCase());
+lines.push('Instabilidade hemodinâmica no intraoperatório'+(detalhes.length?': '+detalhes.join(', '):'')+'.');
+}
+if(checked('respVM')){
+const modo=val('vmModo')||'VCV';
+const vc=val('vmVc')||'500';
+const fr=val('vmFr')||'12';
+const fio2=val('vmFiO2')||'0,5';
+const peep=val('vmPeep')||'5';
+const delta=val('vmDelta')||'<15';
+lines.push('Mantido em ventilação mecânica modo '+modo+', Vc '+vc+' mL, FR '+fr+' ipm, FiO₂ '+fio2+', PEEP '+peep+' cmH₂O, ΔP '+delta+' cmH₂O.');
+const obsResp=val('respInterc');
+if(obsResp)lines.push(obsResp+'.');
+}else{
+const resp=[];
+if(checked('respEspont'))resp.push('ventilação espontânea');
+if(checked('respO2'))resp.push('O₂ suplementar');
+if(checked('respTraq'))resp.push('traqueostomia');
+if(resp.length)lines.push('Respiratório: '+resp.join(', ')+'.');
+}
+const aporte=val('aporteLiquidos');
+const diurese=val('diurese');
+if(aporte||diurese)lines.push('Balanço hídrico: aporte '+(aporte?aporte+' mL':'não registrado')+', diurese '+(diurese?diurese+' mL':'não registrada')+'.');
+const atb=val('antibiotico');
+if(atb){
+const rep=val('horarioRepique');
+lines.push('Antibiótico: '+atb+(rep?', repique previsto para '+rep:'')+'.');
+}
+const sangEst=val('sangramentoEst');
+const sangNM=checked('sangramentoNM');
+if(sangEst||sangNM){
+lines.push('Sangramento estimado: '+(sangNM?'não mensurável':(sangEst?sangEst+' mL':'não registrado'))+'.');
+}
+if(checked('transfusaoChk')){
+const transfusoes=[];
+const ch=val('qtyCH');
+const pfc=val('qtyPFC');
+const plaq=val('qtyPlaq');
+if(ch)transfusoes.push(ch+' unidade'+(ch>1?'s':'')+' de concentrado de hemácias');
+if(pfc)transfusoes.push(pfc+' unidade'+(pfc>1?'s':'')+' de plasma fresco');
+if(plaq)transfusoes.push(plaq+' unidade'+(plaq>1?'s':'')+' de plaquetas');
+if(transfusoes.length)lines.push('Transfundido '+transfusoes.join(', ')+'.');
+}
+const glic=val('glicemia');
+if(glic)lines.push('Glicemia: '+glic+' mg/dL.');
+const labs=val('labs');
+if(labs)lines.push('Exames: '+labs+'.');
+return lines.join('\n');
+}
+
+function gerarRecomendacao(){
+const lines=[];
+const transp=[];
+if(checked('monitContinua'))transp.push('monitorização contínua');
+if(checked('usoVasoTransp')){
+const vasos=[];
+document.querySelectorAll('.vasoChk:checked').forEach(cb=>{
+const vaso=cb.value;
+let dose='';
+if(vaso==='Noradrenalina'&&val('doseNorad'))dose=' '+val('doseNorad')+' mcg/kg/min';
+if(vaso==='Vasopressina'&&val('doseVasop'))dose=' '+val('doseVasop')+' mcg/kg/min';
+if(vaso==='Dobutamina'&&val('doseDobu'))dose=' '+val('doseDobu')+' mcg/kg/min';
+if(vaso==='Nitroglicerina'&&val('doseNitro'))dose=' '+val('doseNitro')+' mcg/kg/min';
+if(vaso==='Nitroprussiato'&&val('doseNitrop'))dose=' '+val('doseNitrop')+' mcg/kg/min';
+vasos.push(vaso.toLowerCase()+dose);
+});
+if(checked('vasoOutrosChk')&&val('vasoOutrosTxt'))vasos.push(val('vasoOutrosTxt').toLowerCase());
+if(vasos.length)transp.push('drogas vasoativas: '+vasos.join(', '));
+}
+if(transp.length)lines.push('Transporte: '+transp.join(', ')+'.');
+const seds=[];
+document.querySelectorAll('.sedacao:checked').forEach(cb=>seds.push(cb.value.toLowerCase()));
+if(seds.length)lines.push('Sedação: '+seds.join(', ')+'.');
+const vents=[];
+document.querySelectorAll('.ventilacao:checked').forEach(cb=>vents.push(cb.value.toLowerCase()));
+if(vents.length)lines.push('Suporte ventilatório: '+vents.join(', ')+'.');
+const obs=val('observacoes');
+if(obs)lines.push('Observações: '+obs);
+return lines.join('\n');
+}
+
+function gerarRelatorio(){
+const s=gerarSituacao();
+const b=gerarBackground();
+const a=gerarAvaliacao();
+const r=gerarRecomendacao();
+textoGerado='═══════════════════════════════════════\nPASSAGEM DE PLANTÃO - SBAR ANESTESIA\n═══════════════════════════════════════\n\n[S] SITUAÇÃO\n'+s+'\n\n[B] BACKGROUND\n'+b+'\n\n[A] AVALIAÇÃO\n'+a+'\n\n[R] RECOMENDAÇÃO\n'+r+'\n\n═══════════════════════════════════════';
+$('resultado').textContent=textoGerado;
+}
+
+function copiar(){
+if(!textoGerado){alert('Gere o relatório primeiro!');return}
+navigator.clipboard.writeText(textoGerado).then(()=>alert('✅ Relatório copiado!')).catch(()=>alert('❌ Erro ao copiar'));
+}
+
+function gerarPDF(){
+if(!textoGerado){alert('Gere o relatório primeiro!');return}
+const{jsPDF}=window.jspdf;
+const doc=new jsPDF();
+doc.setFont('courier');
+doc.setFontSize(10);
+const lines=doc.splitTextToSize(textoGerado,180);
+doc.text(lines,15,15);
+doc.save('sbar-anestesia.pdf');
+}
+
+function novoCaso(){
+if(!confirm('Limpar todos os campos?'))return;
+document.querySelectorAll('input,select,textarea').forEach(el=>{
+if(el.type==='checkbox')el.checked=false;else el.value='';
+});
+setDefaults();
+textoGerado='';
+$('resultado').innerHTML='<div class="resultado-vazio">Clique em "Gerar Relatório"</div>';
+hide($('origemDetalhes'));
+hide($('comorbOutrosTxt'));
+hide($('neuroeixoOpcoes'));
+hide($('raquiDetalhes'));
+hide($('periduralDetalhes'));
+hide($('analgVenOutrosTxt'));
+hide($('analgPeriduralDet'));
+hide($('analgRaquiDet'));
+hide($('analgRaquiOutrosTxt'));
+hide($('analgBloqPerifTxt'));
+hide($('monOutrosTxt'));
+hide($('hemoInstDet'));
+hide($('vasoDet'));
+hide($('vasoOutrosTxt'));
+hide($('vmParams'));
+hide($('transfusaoDet'));
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+initUI();
+$('btnGerar').addEventListener('click',gerarRelatorio);
+$('btnCopiar').addEventListener('click',copiar);
+$('btnPDF').addEventListener('click',gerarPDF);
+$('btnNovo').addEventListener('click',novoCaso);
+});
+</script>
 </body>
 </html>
