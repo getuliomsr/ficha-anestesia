@@ -81,6 +81,14 @@ select.st-pend{border-color:var(--warn);color:var(--warn);font-weight:700;backgr
 select.st-feito{border-color:var(--accent);color:var(--accent)}
 select.st-nao{color:var(--muted)}
 .section-content summary,details.card>summary{font-weight:600}
+.rep-row{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;padding:9px 0;border-bottom:1px dashed var(--line)}
+.rep-row>select,.rep-row>input[type=text]{flex:1;min-width:130px}
+.rep-row input[type=date]{min-width:150px}
+.rep-field{display:flex;flex-direction:column;gap:3px}
+.rep-field>label{font-size:11px;color:var(--muted);margin:0}
+.rep-rm{background:#fff;border:1px solid var(--line-2);color:var(--ink-2);border-radius:8px;padding:9px 13px;font-weight:700;cursor:pointer;flex:0 0 auto;line-height:1}
+.rep-rm:hover{background:#fee2e2;border-color:#fca5a5;color:#b91c1c}
+.rep-add{margin-top:12px}
 
 </style>
 </head>
@@ -426,6 +434,24 @@ select.st-nao{color:var(--muted)}
 <label class="checkbox-label" style="display:inline-flex"><input type="checkbox" id="evPermaneceCC"/> Permanece em centro cirúrgico aguardando leito de UTI</label>
 </div>
 
+<div class="block">
+<h3>Dispositivos e cateteres</h3>
+<div id="evDispList"></div>
+<button type="button" class="secondary rep-add" id="evAddDisp">+ Adicionar dispositivo</button>
+</div>
+
+<div class="block">
+<h3>Antibióticos</h3>
+<div id="evAtbList"></div>
+<button type="button" class="secondary rep-add" id="evAddAtb">+ Adicionar antibiótico</button>
+</div>
+
+<div class="block">
+<h3>Culturas em andamento</h3>
+<div id="evCultList"></div>
+<button type="button" class="secondary rep-add" id="evAddCult">+ Adicionar cultura</button>
+</div>
+
 <div class="block bundle">
 <h3>Profilaxias e cuidados</h3>
 <div class="bundle-grid">
@@ -525,7 +551,6 @@ select.st-nao{color:var(--muted)}
 <label class="checkbox-label" style="display:inline-flex"><input type="checkbox" id="evInfSA"/> Sem alterações</label>
 <div id="evInfDet" class="grid" style="margin-top:10px">
 <div class="field"><label>Temperatura</label><input id="evInfTemp" type="text" placeholder="Ex: 36,8 °C / afebril"/></div>
-<div class="field"><label>Antibiótico + dia</label><input id="evInfAtb" type="text" placeholder="Ex: cefazolina D1"/></div>
 <div class="field"><label>Foco / culturas</label><input id="evInfFoco" type="text" placeholder="Ex: sem foco infeccioso"/></div>
 <div class="field"><label>Hb / plaquetas / outros labs</label><input id="evInfLabs" type="text" placeholder="Ex: Hb 10,5 / plaq 180mil"/></div>
 </div>
@@ -537,7 +562,7 @@ select.st-nao{color:var(--muted)}
 <div class="field"><label>Diagnóstico / problemas</label><input id="evDx" type="text" placeholder="Ex: pós-operatório de gastrectomia por neoplasia"/></div>
 <div class="grid-3">
 <div class="field"><label>Neurológico (geral)</label><select id="evAvNeuro"><option value="">—</option><option value="sedo">Sedoanalgesia contínua</option><option value="vigil">Vigil e orientado</option><option value="rebaixado">Rebaixado</option><option value="agitado">Agitado</option></select></div>
-<div class="field"><label>Hemodinâmico (geral)</label><select id="evAvHemo"><option value="">—</option><option value="estavel_sem">Estável sem DVA</option><option value="estavel_com">Estável com DVA</option><option value="instavel">Instável</option></select></div>
+<div class="field"><label>Hemodinâmico (geral)</label><select id="evAvHemo"><option value="">—</option><option value="estavel_sem">Estável sem DVA</option><option value="instavel">Instável às custas de DVA</option></select></div>
 <div class="field"><label>Respiratório (geral)</label><select id="evAvResp"><option value="">—</option><option value="vm">VM com bons parâmetros</option><option value="espontanea">Ventilação espontânea</option><option value="ir">Insuficiência respiratória</option></select></div>
 </div>
 <div class="field" style="margin-top:14px"><label>Conduta</label><textarea id="evConduta" placeholder="Condutas, ajustes, metas..."></textarea></div>
@@ -949,6 +974,61 @@ return p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear()+' '+p(d.getHours
 const evSistemas=[['evNeuroSA','evNeuroDet'],['evHemoSA','evHemoDet'],['evRespSA','evRespDet'],['evRenalSA','evRenalDet'],['evAbdSA','evAbdDet'],['evInfSA','evInfDet']];
 const evBundle=[['evBTev','profilaxia de TEV'],['evBUlcera','profilaxia de úlcera de estresse'],['evBGlic','controle glicêmico'],['evBCabeceira','cabeceira elevada (≥30°)'],['evBAnalg','analgesia prescrita com resgate'],['evBAntiem','antiemético prescrito'],['evBTemp','controle de temperatura/normotermia'],['evBAtb','antibiótico em dia / repique'],['evBBalanco','balanço / reposição volêmica'],['evBDieta','dieta definida'],['evBOcular','cuidados oculares / sedação se IOT']];
 
+const DISP_FIELDS=[
+{f:'tipo',type:'select',options:[{v:'',l:'Tipo'},'AVP','CVC','PICC','PAI','Sonda vesical (SVD)','SNG/SOG','Tubo orotraqueal','Traqueostomia','Dreno','Cateter peridural','Outro']},
+{f:'sitio',type:'text',placeholder:'sítio / observação'},
+{f:'data',type:'date',lbl:'Inserção'},
+{f:'emuso',type:'checkbox',label:'em uso'}
+];
+const ATB_FIELDS=[
+{f:'nome',type:'text',placeholder:'Antibiótico'},
+{f:'inicio',type:'date',lbl:'Início'},
+{f:'fim',type:'date',lbl:'Fim'},
+{f:'emuso',type:'checkbox',label:'em uso'}
+];
+const CULT_FIELDS=[
+{f:'material',type:'select',options:[{v:'',l:'Material'},'Hemocultura','Urocultura','Secreção traqueal','Lavado broncoalveolar','Ponta de cateter','Líquido peritoneal','Outro']},
+{f:'data',type:'date',lbl:'Coleta'},
+{f:'status',type:'text',placeholder:'status / obs (ex: aguardando resultado)'}
+];
+
+function makeField(f){
+let el;
+if(f.type==='select'){el=document.createElement('select');(f.options||[]).forEach(o=>{const opt=document.createElement('option');const v=(o&&o.v!==undefined)?o.v:o;const l=(o&&o.l!==undefined)?o.l:o;opt.value=v;opt.textContent=l;el.appendChild(opt);});}
+else{el=document.createElement('input');el.type=f.type||'text';if(f.placeholder)el.placeholder=f.placeholder;}
+el.dataset.f=f.f;
+if(f.lbl){const w=document.createElement('div');w.className='rep-field';const lb=document.createElement('label');lb.textContent=f.lbl;w.appendChild(lb);w.appendChild(el);return w;}
+return el;
+}
+function addRow(containerId,fields){
+const row=document.createElement('div');
+row.className='rep-row';
+fields.forEach(f=>{
+if(f.type==='checkbox'){const lab=document.createElement('label');lab.className='checkbox-label';const cb=document.createElement('input');cb.type='checkbox';cb.dataset.f=f.f;lab.appendChild(cb);lab.appendChild(document.createTextNode(' '+(f.label||f.f)));row.appendChild(lab);return;}
+row.appendChild(makeField(f));
+});
+const rm=document.createElement('button');rm.type='button';rm.className='rep-rm';rm.textContent='×';rm.title='Remover';rm.onclick=()=>row.remove();
+row.appendChild(rm);
+$(containerId).appendChild(row);
+}
+function readRows(containerId){
+return Array.from($(containerId).querySelectorAll('.rep-row')).map(row=>{
+const o={};
+row.querySelectorAll('[data-f]').forEach(el=>{o[el.dataset.f]=el.type==='checkbox'?el.checked:el.value.trim();});
+return o;
+});
+}
+function fmtData(v){if(!v)return '';const s=v.split('-');if(s.length!==3)return v;return s[2]+'/'+s[1]+'/'+s[0];}
+function diasDesde(v){
+if(!v)return null;
+const ev=val('evDataHora')?new Date(val('evDataHora')):new Date();
+const ins=new Date(v+'T00:00');
+if(isNaN(ins)||isNaN(ev))return null;
+const a=new Date(ev.getFullYear(),ev.getMonth(),ev.getDate());
+const b=new Date(ins.getFullYear(),ins.getMonth(),ins.getDate());
+return Math.round((a-b)/86400000);
+}
+
 function corBundle(sel){
 sel.classList.remove('st-pend','st-feito','st-nao');
 if(sel.value==='pend')sel.classList.add('st-pend');
@@ -959,14 +1039,83 @@ else if(sel.value==='nao')sel.classList.add('st-nao');
 function initEvolucao(){
 evSistemas.forEach(([sa,det])=>$(sa).addEventListener('change',e=>e.target.checked?hide($(det)):show($(det))));
 document.querySelectorAll('.bundleSel').forEach(s=>s.addEventListener('change',()=>corBundle(s)));
+$('evAddDisp').addEventListener('click',()=>addRow('evDispList',DISP_FIELDS));
+$('evAddAtb').addEventListener('click',()=>addRow('evAtbList',ATB_FIELDS));
+$('evAddCult').addEventListener('click',()=>addRow('evCultList',CULT_FIELDS));
+addRow('evDispList',DISP_FIELDS);
+addRow('evAtbList',ATB_FIELDS);
+addRow('evCultList',CULT_FIELDS);
 const dh=$('evDataHora');
 if(dh&&!dh.value){const n=new Date();n.setMinutes(n.getMinutes()-n.getTimezoneOffset());dh.value=n.toISOString().slice(0,16);}
 }
 
-function linhaSistema(saId,nome,campos,normal){
-if(checked(saId))return nome+': '+(normal||'sem alterações')+'.';
-const partes=campos.map(id=>val(id)).filter(Boolean);
-return partes.length?nome+': '+partes.join('; ')+'.':'';
+const SIS_HEMO=[
+{id:'evHemoPA',normal:'PA e FC estáveis, ritmo sinusal'},
+{id:'evHemoDVA',normal:'sem drogas vasoativas',fmt:v=>'em uso de '+v},
+{normal:'ausculta cardíaca com bulhas normofonéticas, ritmo regular em 2 tempos, sem sopros'},
+{id:'evHemoLactato',fmt:v=>/lact/i.test(v)?v:'lactato '+v},
+{id:'evHemoObs',fmt:v=>v}
+];
+const SIS_RENAL=[
+{id:'evRenalDiurese',normal:'diurese presente e adequada',fmt:v=>/diur|olig|an[úu]r/i.test(v)?v:'diurese '+v},
+{id:'evRenalBalanco',fmt:v=>/balan/i.test(v)?v:'balanço '+v},
+{id:'evRenalLabs',normal:'função renal e eletrólitos sem alterações relevantes'},
+{id:'evRenalGlic',normal:'glicemia controlada',fmt:v=>/glic/i.test(v)?v:'glicemia '+v}
+];
+const SIS_ABD=[
+{id:'evAbdExame',normal:'abdome flácido, indolor à palpação, ruídos hidroaéreos presentes'},
+{id:'evAbdFerida',normal:'ferida operatória com curativo limpo e seco'},
+{id:'evAbdDrenos',fmt:v=>v},
+{id:'evAbdDebito',fmt:v=>/d[ée]bito/i.test(v)?v:'débito de drenos: '+v}
+];
+const SIS_INF=[
+{id:'evInfTemp',normal:'afebril'},
+{normal:'sem sinais clínicos de infecção em atividade'},
+{id:'evInfFoco',fmt:v=>v},
+{id:'evInfLabs',fmt:v=>v}
+];
+
+/* Monta a linha de um sistema: parte vazia -> texto normal; parte preenchida -> texto formatado */
+function renderSistema(nome,saId,partes){
+const ignore=checked(saId);
+const out=partes.map(p=>{
+const v=(!ignore&&p.id)?val(p.id):'';
+if(v)return p.fmt?p.fmt(v):v;
+return p.normal||'';
+}).filter(Boolean);
+return out.length?nome+': '+out.join('; ')+'.':'';
+}
+
+function renderNeuro(){
+const intub=checked('evNeuroIntubado');
+const ignore=checked('evNeuroSA');
+if(intub){
+let s='Neurológico: RASS -5, em sedoanalgesia contínua';
+const obs=ignore?'':val('evNeuroObs');
+if(obs)s+='; '+obs;
+return s+'.';
+}
+return renderSistema('Neurológico','evNeuroSA',[
+{id:'evNeuroRass',normal:gEv('vigil e orientado','vigil e orientada')},
+{id:'evNeuroGlasgow',normal:'pupilas isocóricas e fotorreagentes'},
+{id:'evNeuroDor',normal:'sem queixa álgica',fmt:v=>/^\d+(?:[.,]\d+)?$/.test(v)?'dor '+v+'/10':'dor '+v},
+{id:'evNeuroObs',fmt:v=>v}
+]);
+}
+
+function renderResp(){
+const vm=checked('evRespVM');
+const ignore=checked('evRespSA');
+const g2=id=>ignore?'':val(id);
+const out=[];
+if(vm)out.push('em ventilação mecânica com bons parâmetros ventilatórios');
+else out.push(g2('evRespSuporte')?'em '+g2('evRespSuporte'):gEv('eupneico','eupneica')+' em ar ambiente');
+out.push(g2('evRespSpo2')||'saturação adequada');
+out.push('ausculta pulmonar com murmúrio vesicular '+(vm?'presente bilateralmente':'fisiológico')+', sem ruídos adventícios');
+if(g2('evRespParam'))out.push(g2('evRespParam'));
+out.push(g2('evRespGaso')||'boa troca gasosa');
+if(g2('evRespObs'))out.push(g2('evRespObs'));
+return 'Respiratório: '+out.filter(Boolean).join('; ')+'.';
 }
 
 function gerarEvolucao(){
@@ -987,6 +1136,47 @@ const sl=[];
 if(checked('evPermaneceCC'))sl.push(gEv('permanece','permanece')+' em centro cirúrgico aguardando leito de UTI, sob assistência da anestesiologia');
 if(sl.length){lines.push('');lines.push('SITUAÇÃO DE LEITO: '+sl.join('; ')+'.');}
 
+/* Dispositivos e cateteres */
+const disp=readRows('evDispList').filter(r=>r.tipo||r.sitio||r.data||r.emuso);
+if(disp.length){
+lines.push('');lines.push('DISPOSITIVOS:');
+disp.forEach(r=>{
+let s='  - '+(r.tipo||'dispositivo');
+if(r.sitio)s+=' ('+r.sitio+')';
+const dd=r.data?diasDesde(r.data):null;
+const dn=(dd!=null&&dd>=0)?'D'+(dd+1):'';
+if(r.data){s+=': inserido em '+fmtData(r.data);const ex=[dn,r.emuso?'em uso':''].filter(Boolean);if(ex.length)s+=' ('+ex.join(', ')+')';}
+else if(r.emuso)s+=': em uso';
+lines.push(s);
+});
+}
+
+/* Antibióticos */
+const atb=readRows('evAtbList').filter(r=>r.nome);
+if(atb.length){
+lines.push('');lines.push('ANTIBIÓTICOS:');
+atb.forEach(r=>{
+let s='  - '+r.nome;
+const ini=r.inicio?fmtData(r.inicio):'';
+if(r.emuso){const dd=r.inicio?diasDesde(r.inicio):null;const dn=(dd!=null&&dd>=0)?'D'+(dd+1):'';const meta=[ini?'início '+ini:'',dn,'em uso'].filter(Boolean);s+=' ('+meta.join(', ')+')';}
+else if(r.fim)s+=' ('+(ini||'?')+' a '+fmtData(r.fim)+')';
+else if(ini)s+=' (início '+ini+')';
+lines.push(s);
+});
+}
+
+/* Culturas em andamento */
+const cult=readRows('evCultList').filter(r=>r.material);
+if(cult.length){
+lines.push('');lines.push('CULTURAS EM ANDAMENTO:');
+cult.forEach(r=>{
+let s='  - '+r.material;
+if(r.data)s+=' (coletada em '+fmtData(r.data)+')';
+if(r.status)s+=' — '+r.status;
+lines.push(s);
+});
+}
+
 /* Profilaxias e cuidados */
 const pend=[],feito=[],naoind=[];
 evBundle.forEach(([id,nome])=>{const v=val(id);if(v==='pend')pend.push(nome);else if(v==='feito')feito.push(nome);else if(v==='nao')naoind.push(nome);});
@@ -998,44 +1188,14 @@ if(feito.length)lines.push('  Realizado: '+feito.join(', ')+'.');
 if(naoind.length)lines.push('  Não indicado: '+naoind.join(', ')+'.');
 }
 
-/* Revisão por sistemas */
-const sis=[];
-let neuroLine;
-const intub=checked('evNeuroIntubado');
-if(checked('evNeuroSA')){
-neuroLine=intub?'Neurológico: RASS -5, em sedoanalgesia contínua.':'Neurológico: '+gEv('vigil e orientado','vigil e orientada')+', sem déficits focais aparentes, pupilas isocóricas e fotorreagentes, sem queixa álgica.';
-}else{
-const np=[];
-if(intub)np.push('intubado em sedoanalgesia contínua');
-['evNeuroRass','evNeuroGlasgow','evNeuroDor','evNeuroObs'].forEach(id=>{if(val(id))np.push(val(id));});
-neuroLine=np.length?'Neurológico: '+np.join('; ')+'.':'';
-}
-sis.push(neuroLine);
-
-sis.push(linhaSistema('evHemoSA','Hemodinâmico',['evHemoPA','evHemoDVA','evHemoLactato','evHemoObs'],'hemodinamicamente estável, sem drogas vasoativas; ausculta cardíaca com bulhas normofonéticas, ritmo regular em 2 tempos, sem sopros'));
-
-let resp;
-const vm=checked('evRespVM');
-if(checked('evRespSA')){
-resp=vm?'Respiratório: em ventilação mecânica com bons parâmetros ventilatórios; ausculta pulmonar com murmúrio vesicular presente bilateralmente, sem ruídos adventícios; boa troca gasosa.':'Respiratório: '+gEv('eupneico','eupneica')+' em ar ambiente; ausculta pulmonar com murmúrio vesicular fisiológico, sem ruídos adventícios; boa troca gasosa.';
-}else{
-const rp=[];
-if(vm)rp.push('em ventilação mecânica');
-else if(val('evRespSuporte'))rp.push('em '+val('evRespSuporte'));
-['evRespSpo2','evRespParam','evRespGaso','evRespObs'].forEach(id=>{if(val(id))rp.push(val(id));});
-resp=rp.length?'Respiratório: '+rp.join('; ')+'.':'';
-}
-sis.push(resp);
-
-sis.push(linhaSistema('evRenalSA','Renal/metabólico',['evRenalDiurese','evRenalBalanco','evRenalLabs','evRenalGlic'],'diurese presente e adequada, sem distúrbios hidroeletrolíticos relevantes, função renal preservada'));
-sis.push(linhaSistema('evAbdSA','Abdome/ferida/drenos',['evAbdExame','evAbdFerida','evAbdDrenos','evAbdDebito'],'abdome flácido, indolor à palpação, ruídos hidroaéreos presentes; ferida operatória com curativo limpo e seco; drenos com débito habitual'));
-sis.push(linhaSistema('evInfSA','Infeccioso',['evInfTemp','evInfAtb','evInfFoco','evInfLabs'],'afebril, sem sinais clínicos de infecção em atividade'));
+/* Revisão por sistemas (campo vazio = normal) */
+const sis=[renderNeuro(),renderSistema('Hemodinâmico','evHemoSA',SIS_HEMO),renderResp(),renderSistema('Renal/metabólico','evRenalSA',SIS_RENAL),renderSistema('Abdome/ferida/drenos','evAbdSA',SIS_ABD),renderSistema('Infeccioso','evInfSA',SIS_INF)];
 const sisFiltrado=sis.filter(Boolean);
 if(sisFiltrado.length){lines.push('');lines.push('EXAME POR SISTEMAS:');sisFiltrado.forEach(s=>lines.push(s));}
 
 /* Avaliação e conduta */
 const avNeuroMap={sedo:'em sedoanalgesia contínua',vigil:gEv('vigil e orientado','vigil e orientada'),rebaixado:'com rebaixamento do nível de consciência',agitado:gEv('agitado','agitada')};
-const avHemoMap={estavel_sem:'hemodinamicamente estável, sem drogas vasoativas',estavel_com:'hemodinamicamente estável em uso de drogas vasoativas',instavel:'hemodinamicamente instável'};
+const avHemoMap={estavel_sem:'hemodinamicamente estável, sem drogas vasoativas',instavel:'hemodinamicamente instável às custas de drogas vasoativas'};
 const avRespMap={vm:'em ventilação mecânica com bons parâmetros',espontanea:'em ventilação espontânea',ir:'com insuficiência respiratória'};
 const dx=val('evDx');
 const pano=[];
@@ -1044,10 +1204,11 @@ if(avRespMap[val('evAvResp')])pano.push(avRespMap[val('evAvResp')]);
 if(avNeuroMap[val('evAvNeuro')])pano.push(avNeuroMap[val('evAvNeuro')]);
 if(dx||pano.length){
 lines.push('');
-let av='AVALIAÇÃO:';
-if(dx)av+=' '+dx+(/[.!?]$/.test(dx)?'':'.');
-if(pano.length)av+=' Paciente '+pano.join(', ')+'.';
-lines.push(av);
+lines.push('AVALIAÇÃO:'+(dx?' '+dx+(/[.!?]$/.test(dx)?'':'.'):''));
+if(pano.length){
+pano[0]='Paciente '+pano[0];
+pano.forEach((p,i)=>lines.push(p+(i===pano.length-1?'.':'')));
+}
 }
 if(val('evConduta')){lines.push('');lines.push('CONDUTA: '+val('evConduta'));}
 if(val('evPendencias')){lines.push('');lines.push('PENDÊNCIAS: '+val('evPendencias'));}
@@ -1081,6 +1242,8 @@ if(el.type==='checkbox')el.checked=false;else el.value='';
 });
 document.querySelectorAll('.bundleSel').forEach(corBundle);
 evSistemas.forEach(([,det])=>show($(det)));
+$('evDispList').innerHTML='';$('evAtbList').innerHTML='';$('evCultList').innerHTML='';
+addRow('evDispList',DISP_FIELDS);addRow('evAtbList',ATB_FIELDS);addRow('evCultList',CULT_FIELDS);
 const dh=$('evDataHora');const n=new Date();n.setMinutes(n.getMinutes()-n.getTimezoneOffset());dh.value=n.toISOString().slice(0,16);
 textoEvolucao='';
 $('evResultado').innerHTML='<div class="resultado-vazio">Clique em "Gerar evolução"</div>';
