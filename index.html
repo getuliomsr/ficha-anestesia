@@ -61,17 +61,40 @@ button.secondary:hover{background:#f1f5f9;color:var(--ink)}
 .badge.r{background:#475569}
 
 h2{margin:22px 0 10px;font-size:15px;font-weight:650;color:var(--ink-2);text-transform:uppercase;letter-spacing:.04em}
-#resultado{white-space:pre-wrap;padding:18px;background:#fff;border-radius:var(--radius);border:1px solid var(--line);min-height:120px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;line-height:1.7;color:var(--ink)}
+#resultado,#evResultado{white-space:pre-wrap;padding:18px;background:#fff;border-radius:var(--radius);border:1px solid var(--line);min-height:120px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;line-height:1.7;color:var(--ink)}
 .resultado-vazio{color:var(--muted);text-align:center;padding:32px;font-style:italic;font-family:inherit}
 @media(max-width:768px){.grid,.grid-3{grid-template-columns:1fr}body{padding:16px 10px}}
+
+.tabs{display:flex;gap:6px;margin-top:14px}
+.tab{padding:9px 14px;border:1px solid var(--line);background:#fff;color:var(--ink-2);border-radius:8px;font-weight:600;font-size:13.5px;cursor:pointer;transition:background .15s,color .15s}
+.tab:hover{background:#f1f5f9}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.block{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.block>h3{margin:0 0 12px;font-size:14px;font-weight:650;color:var(--ink)}
+.block.alert{border-left:4px solid var(--warn)}
+.block.bundle{border-left:4px solid var(--accent)}
+.bundle-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:0 20px}
+.bundle-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--line)}
+.bundle-row label{margin:0;font-size:13.5px;color:var(--ink)}
+.bundle-row select{width:auto;min-width:140px}
+select.st-pend{border-color:var(--warn);color:var(--warn);font-weight:700;background:#fffbeb}
+select.st-feito{border-color:var(--accent);color:var(--accent)}
+select.st-nao{color:var(--muted)}
+.section-content summary,details.card>summary{font-weight:600}
+
 </style>
 </head>
 <body>
 <div class="container">
 <header>
-<h1>SBAR Anestesia</h1>
-<div class="subtitle">Gerador de passagem de plantão intraoperatório / pós-cirúrgico</div>
+<h1>Ferramentas de Anestesia</h1>
+<div class="tabs">
+<button class="tab active" data-tab="sbar">SBAR — Passagem</button>
+<button class="tab" data-tab="evolucao">Evolução UTI / Pós-op</button>
+</div>
 </header>
+
+<div id="tab-sbar" class="tabpanel">
 
 <details open class="card">
 <summary><span class="badge s">S</span> Situação<span class="chev">▶</span></summary>
@@ -380,6 +403,157 @@ h2{margin:22px 0 10px;font-size:15px;font-weight:650;color:var(--ink-2);text-tra
 
 <h2>Relatório</h2>
 <div id="resultado"><div class="resultado-vazio">Clique em "Gerar relatório"</div></div>
+
+</div><!-- /tab-sbar -->
+
+<div id="tab-evolucao" class="tabpanel" style="display:none">
+
+<div class="block">
+<h3>Identificação</h3>
+<div class="grid">
+<div class="field"><label>Nome do paciente</label><input id="evNome" type="text" placeholder="Ex: Maria Souza"/></div>
+<div class="field"><label>Sexo e idade</label><div class="inline"><select id="evSexo"><option value="">Sexo</option><option value="masculino">Masculino</option><option value="feminino">Feminino</option></select><input id="evIdade" type="number" placeholder="Idade" min="0" max="120"/></div></div>
+</div>
+<div class="grid">
+<div class="field"><label>Data/hora da avaliação</label><input id="evDataHora" type="datetime-local"/></div>
+<div class="field"><label>Tempo de pós-operatório</label><input id="evPOD" type="text" placeholder="Ex: pós-op imediato / 6h"/></div>
+</div>
+<div class="field"><label>Procedimento realizado</label><input id="evProc" type="text" placeholder="Ex: Laparotomia exploradora"/></div>
+</div>
+
+<div class="block alert">
+<h3>Situação de leito</h3>
+<label class="checkbox-label" style="display:inline-flex"><input type="checkbox" id="evPermaneceCC"/> Permanece em centro cirúrgico aguardando leito de UTI</label>
+</div>
+
+<div class="block bundle">
+<h3>Profilaxias e cuidados</h3>
+<div class="bundle-grid">
+<div class="bundle-row"><label>Profilaxia de TEV</label><select id="evBTev" class="bundleSel"><option value="">—</option><option value="feito">Feito</option><option value="nao">Não indicado</option><option value="pend">Pendente</option></select></div>
+<div class="bundle-row"><label>Profilaxia de úlcera de estresse</label><select id="evBUlcera" class="bundleSel"><option value="">—</option><option value="feito">Feito</option><option value="nao">Não indicado</option><option value="pend">Pendente</option></select></div>
+<div class="bundle-row"><label>Controle glicêmico</label><select id="evBGlic" class="bundleSel"><option value="">—</option><option value="feito">Feito</option><option value="nao">Não indicado</option><option value="pend">Pendente</option></select></div>
+<div class="bundle-row"><label>Cabeceira elevada (≥30°)</label><select id="evBCabeceira" class="bundleSel"><option value="">—</option><option value="feito">Feito</option><option value="nao">Não indicado</option><option value="pend">Pendente</option></select></div>
+<div class="bundle-row"><label>Analgesia prescrita + resgate</label><select id="evBAnalg" class="bundleSel"><option value="">—</option><option value="feito">Feito</option><option value="nao">Não indicado</option><option value="pend">Pendente</option></select></div>
+<div class="bundle-row"><label>Antiemético prescrito</label><select id="evBAntiem" class="bundleSel"><option value="">—</option><option value="feito">Feito</option><option value="nao">Não indicado</option><option value="pend">Pendente</option></select></div>
+<div class="bundle-row"><label>Controle de temperatura / normotermia</label><select id="evBTemp" class="bundleSel"><option value="">—</option><option value="feito">Feito</option><option value="nao">Não indicado</option><option value="pend">Pendente</option></select></div>
+<div class="bundle-row"><label>Antibiótico em dia / repique</label><select id="evBAtb" class="bundleSel"><option value="">—</option><option value="feito">Feito</option><option value="nao">Não indicado</option><option value="pend">Pendente</option></select></div>
+<div class="bundle-row"><label>Balanço / reposição volêmica</label><select id="evBBalanco" class="bundleSel"><option value="">—</option><option value="feito">Feito</option><option value="nao">Não indicado</option><option value="pend">Pendente</option></select></div>
+<div class="bundle-row"><label>Dieta definida (zero / progressão)</label><select id="evBDieta" class="bundleSel"><option value="">—</option><option value="feito">Feito</option><option value="nao">Não indicado</option><option value="pend">Pendente</option></select></div>
+<div class="bundle-row"><label>Cuidados oculares / sedação se IOT</label><select id="evBOcular" class="bundleSel"><option value="">—</option><option value="feito">Feito</option><option value="nao">Não indicado</option><option value="pend">Pendente</option></select></div>
+</div>
+</div>
+
+<details class="card" open>
+<summary>Neurológico<span class="chev">▶</span></summary>
+<div class="section-content">
+<div class="checkbox-group">
+<label class="checkbox-label"><input type="checkbox" id="evNeuroSA"/> Sem alterações</label>
+<label class="checkbox-label"><input type="checkbox" id="evNeuroIntubado"/> Intubado em sedoanalgesia contínua</label>
+</div>
+<div id="evNeuroDet" class="grid" style="margin-top:10px">
+<div class="field"><label>RASS / sedação</label><input id="evNeuroRass" type="text" placeholder="Ex: RASS 0 / propofol"/></div>
+<div class="field"><label>Glasgow / pupilas</label><input id="evNeuroGlasgow" type="text" placeholder="Ex: ECG 15, isocóricas"/></div>
+<div class="field"><label>Dor (0–10)</label><input id="evNeuroDor" type="text" placeholder="Ex: 3"/></div>
+<div class="field"><label>Observações</label><input id="evNeuroObs" type="text" placeholder="Delirium, agitação..."/></div>
+</div>
+</div>
+</details>
+
+<details class="card" open>
+<summary>Hemodinâmico<span class="chev">▶</span></summary>
+<div class="section-content">
+<label class="checkbox-label" style="display:inline-flex"><input type="checkbox" id="evHemoSA"/> Sem alterações</label>
+<div id="evHemoDet" class="grid" style="margin-top:10px">
+<div class="field"><label>PA / FC / ritmo</label><input id="evHemoPA" type="text" placeholder="Ex: 120x70, FC 80, sinusal"/></div>
+<div class="field"><label>Drogas vasoativas + dose</label><input id="evHemoDVA" type="text" placeholder="Ex: noradrenalina 0,1 mcg/kg/min"/></div>
+<div class="field"><label>Lactato / perfusão</label><input id="evHemoLactato" type="text" placeholder="Ex: lactato 1,8"/></div>
+<div class="field"><label>Observações</label><input id="evHemoObs" type="text" placeholder=""/></div>
+</div>
+</div>
+</details>
+
+<details class="card" open>
+<summary>Respiratório<span class="chev">▶</span></summary>
+<div class="section-content">
+<div class="checkbox-group">
+<label class="checkbox-label"><input type="checkbox" id="evRespSA"/> Sem alterações</label>
+<label class="checkbox-label"><input type="checkbox" id="evRespVM"/> Intubado / em ventilação mecânica</label>
+</div>
+<div id="evRespDet" style="margin-top:10px">
+<div class="grid">
+<div class="field"><label>Suporte</label><select id="evRespSuporte"><option value="">Selecione</option><option>ar ambiente</option><option>O₂ suplementar</option><option>VNI</option><option>ventilação mecânica</option></select></div>
+<div class="field"><label>SpO₂ / FiO₂</label><input id="evRespSpo2" type="text" placeholder="Ex: 97% / FiO₂ 0,4"/></div>
+</div>
+<div class="grid">
+<div class="field"><label>Parâmetros / VM</label><input id="evRespParam" type="text" placeholder="Ex: PSV 12, PEEP 5"/></div>
+<div class="field"><label>Gasometria</label><input id="evRespGaso" type="text" placeholder="Ex: pH 7,38 / PaO₂ 92"/></div>
+</div>
+<input id="evRespObs" type="text" placeholder="Observações (secreção, desmame...)" style="margin-top:8px"/>
+</div>
+</div>
+</details>
+
+<details class="card" open>
+<summary>Renal / metabólico<span class="chev">▶</span></summary>
+<div class="section-content">
+<label class="checkbox-label" style="display:inline-flex"><input type="checkbox" id="evRenalSA"/> Sem alterações</label>
+<div id="evRenalDet" class="grid" style="margin-top:10px">
+<div class="field"><label>Diurese</label><input id="evRenalDiurese" type="text" placeholder="Ex: 0,8 mL/kg/h"/></div>
+<div class="field"><label>Balanço hídrico</label><input id="evRenalBalanco" type="text" placeholder="Ex: +850 mL"/></div>
+<div class="field"><label>Função renal / eletrólitos</label><input id="evRenalLabs" type="text" placeholder="Ex: Cr 1,0 / K 4,2"/></div>
+<div class="field"><label>Glicemia</label><input id="evRenalGlic" type="text" placeholder="Ex: 130 mg/dL"/></div>
+</div>
+</div>
+</details>
+
+<details class="card" open>
+<summary>Abdome / ferida / drenos<span class="chev">▶</span></summary>
+<div class="section-content">
+<label class="checkbox-label" style="display:inline-flex"><input type="checkbox" id="evAbdSA"/> Sem alterações</label>
+<div id="evAbdDet" class="grid" style="margin-top:10px">
+<div class="field"><label>Abdome / exame</label><input id="evAbdExame" type="text" placeholder="Ex: flácido, indolor, RHA+"/></div>
+<div class="field"><label>Ferida operatória / curativo</label><input id="evAbdFerida" type="text" placeholder="Ex: curativo limpo e seco"/></div>
+<div class="field"><label>Drenos (tipo / sítio)</label><input id="evAbdDrenos" type="text" placeholder="Ex: dreno tubular em loja hepática"/></div>
+<div class="field"><label>Débito dos drenos</label><input id="evAbdDebito" type="text" placeholder="Ex: 50 mL serossanguíneo"/></div>
+</div>
+</div>
+</details>
+
+<details class="card" open>
+<summary>Infeccioso<span class="chev">▶</span></summary>
+<div class="section-content">
+<label class="checkbox-label" style="display:inline-flex"><input type="checkbox" id="evInfSA"/> Sem alterações</label>
+<div id="evInfDet" class="grid" style="margin-top:10px">
+<div class="field"><label>Temperatura</label><input id="evInfTemp" type="text" placeholder="Ex: 36,8 °C / afebril"/></div>
+<div class="field"><label>Antibiótico + dia</label><input id="evInfAtb" type="text" placeholder="Ex: cefazolina D1"/></div>
+<div class="field"><label>Foco / culturas</label><input id="evInfFoco" type="text" placeholder="Ex: sem foco infeccioso"/></div>
+<div class="field"><label>Hb / plaquetas / outros labs</label><input id="evInfLabs" type="text" placeholder="Ex: Hb 10,5 / plaq 180mil"/></div>
+</div>
+</div>
+</details>
+
+<div class="block">
+<h3>Avaliação e conduta</h3>
+<div class="field"><label>Diagnóstico / problemas</label><input id="evDx" type="text" placeholder="Ex: pós-operatório de gastrectomia por neoplasia"/></div>
+<div class="grid-3">
+<div class="field"><label>Neurológico (geral)</label><select id="evAvNeuro"><option value="">—</option><option value="sedo">Sedoanalgesia contínua</option><option value="vigil">Vigil e orientado</option><option value="rebaixado">Rebaixado</option><option value="agitado">Agitado</option></select></div>
+<div class="field"><label>Hemodinâmico (geral)</label><select id="evAvHemo"><option value="">—</option><option value="estavel_sem">Estável sem DVA</option><option value="estavel_com">Estável com DVA</option><option value="instavel">Instável</option></select></div>
+<div class="field"><label>Respiratório (geral)</label><select id="evAvResp"><option value="">—</option><option value="vm">VM com bons parâmetros</option><option value="espontanea">Ventilação espontânea</option><option value="ir">Insuficiência respiratória</option></select></div>
+</div>
+<div class="field" style="margin-top:14px"><label>Conduta</label><textarea id="evConduta" placeholder="Condutas, ajustes, metas..."></textarea></div>
+<div class="field"><label>Pendências</label><textarea id="evPendencias" placeholder="Contato com equipe cirúrgica, exames, regulação de leito..."></textarea></div>
+<div class="actions">
+<button class="primary" id="evBtnGerar">Gerar evolução</button>
+<button class="secondary" id="evBtnCopiar">Copiar</button>
+<button class="secondary" id="evBtnPDF">PDF</button>
+<button class="secondary" id="evBtnNovo">Novo</button>
+</div>
+</div>
+
+<h2>Evolução</h2>
+<div id="evResultado"><div class="resultado-vazio">Clique em "Gerar evolução"</div></div>
+
+</div><!-- /tab-evolucao -->
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -731,6 +905,7 @@ function paraPDF(t){
 return t
 .replace(/₀/g,'0').replace(/₂/g,'2').replace(/²/g,'2')
 .replace(/Δ/g,'Delta ')
+.replace(/⚠/g,'[!]').replace(/≥/g,'>=').replace(/≤/g,'<=').replace(/°/g,' graus')
 .replace(/[‘’]/g,"'").replace(/[“”]/g,'"');
 }
 
@@ -747,8 +922,8 @@ doc.save('sbar-anestesia.pdf');
 }
 
 function novoCaso(){
-if(!confirm('Limpar todos os campos?'))return;
-document.querySelectorAll('input,select,textarea').forEach(el=>{
+if(!confirm('Limpar todos os campos do SBAR?'))return;
+$('tab-sbar').querySelectorAll('input,select,textarea').forEach(el=>{
 if(el.type==='checkbox')el.checked=false;else el.value='';
 });
 setDefaults();
@@ -759,12 +934,180 @@ show($('inducaoDetalhes'));
 show($('vmParamsDetalhe'));
 }
 
+/* ====================== EVOLUÇÃO UTI / PÓS-OP ====================== */
+let textoEvolucao='';
+function gEv(m,f){return val('evSexo')==='feminino'?f:m;}
+
+function fmtDataHora(v){
+if(!v)return '';
+const d=new Date(v);
+if(isNaN(d))return v;
+const p=n=>String(n).padStart(2,'0');
+return p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear()+' '+p(d.getHours())+':'+p(d.getMinutes());
+}
+
+const evSistemas=[['evNeuroSA','evNeuroDet'],['evHemoSA','evHemoDet'],['evRespSA','evRespDet'],['evRenalSA','evRenalDet'],['evAbdSA','evAbdDet'],['evInfSA','evInfDet']];
+const evBundle=[['evBTev','profilaxia de TEV'],['evBUlcera','profilaxia de úlcera de estresse'],['evBGlic','controle glicêmico'],['evBCabeceira','cabeceira elevada (≥30°)'],['evBAnalg','analgesia prescrita com resgate'],['evBAntiem','antiemético prescrito'],['evBTemp','controle de temperatura/normotermia'],['evBAtb','antibiótico em dia / repique'],['evBBalanco','balanço / reposição volêmica'],['evBDieta','dieta definida'],['evBOcular','cuidados oculares / sedação se IOT']];
+
+function corBundle(sel){
+sel.classList.remove('st-pend','st-feito','st-nao');
+if(sel.value==='pend')sel.classList.add('st-pend');
+else if(sel.value==='feito')sel.classList.add('st-feito');
+else if(sel.value==='nao')sel.classList.add('st-nao');
+}
+
+function initEvolucao(){
+evSistemas.forEach(([sa,det])=>$(sa).addEventListener('change',e=>e.target.checked?hide($(det)):show($(det))));
+document.querySelectorAll('.bundleSel').forEach(s=>s.addEventListener('change',()=>corBundle(s)));
+const dh=$('evDataHora');
+if(dh&&!dh.value){const n=new Date();n.setMinutes(n.getMinutes()-n.getTimezoneOffset());dh.value=n.toISOString().slice(0,16);}
+}
+
+function linhaSistema(saId,nome,campos,normal){
+if(checked(saId))return nome+': '+(normal||'sem alterações')+'.';
+const partes=campos.map(id=>val(id)).filter(Boolean);
+return partes.length?nome+': '+partes.join('; ')+'.':'';
+}
+
+function gerarEvolucao(){
+const linha='='.repeat(46);
+const lines=[];
+
+/* Cabeçalho */
+const ident=[val('evNome')||'Paciente'];
+if(val('evIdade'))ident.push(val('evIdade')+' anos');
+if(val('evSexo'))ident.push('sexo '+val('evSexo'));
+let cab=ident.join(', ')+'.';
+if(val('evProc'))cab+=' '+gEv('Submetido','Submetida')+' a '+val('evProc').toLowerCase()+'.';
+if(val('evPOD')){const p=val('evPOD');cab+=' '+p.charAt(0).toUpperCase()+p.slice(1)+'.';}
+lines.push(cab);
+
+/* Situação de leito */
+const sl=[];
+if(checked('evPermaneceCC'))sl.push(gEv('permanece','permanece')+' em centro cirúrgico aguardando leito de UTI, sob assistência da anestesiologia');
+if(sl.length){lines.push('');lines.push('SITUAÇÃO DE LEITO: '+sl.join('; ')+'.');}
+
+/* Profilaxias e cuidados */
+const pend=[],feito=[],naoind=[];
+evBundle.forEach(([id,nome])=>{const v=val(id);if(v==='pend')pend.push(nome);else if(v==='feito')feito.push(nome);else if(v==='nao')naoind.push(nome);});
+if(pend.length||feito.length||naoind.length){
+lines.push('');
+lines.push('PROFILAXIAS E CUIDADOS:');
+if(pend.length)lines.push('  ⚠ PENDENTE: '+pend.join(', ')+'.');
+if(feito.length)lines.push('  Realizado: '+feito.join(', ')+'.');
+if(naoind.length)lines.push('  Não indicado: '+naoind.join(', ')+'.');
+}
+
+/* Revisão por sistemas */
+const sis=[];
+let neuroLine;
+const intub=checked('evNeuroIntubado');
+if(checked('evNeuroSA')){
+neuroLine=intub?'Neurológico: RASS -5, em sedoanalgesia contínua.':'Neurológico: '+gEv('vigil e orientado','vigil e orientada')+', sem déficits focais aparentes, pupilas isocóricas e fotorreagentes, sem queixa álgica.';
+}else{
+const np=[];
+if(intub)np.push('intubado em sedoanalgesia contínua');
+['evNeuroRass','evNeuroGlasgow','evNeuroDor','evNeuroObs'].forEach(id=>{if(val(id))np.push(val(id));});
+neuroLine=np.length?'Neurológico: '+np.join('; ')+'.':'';
+}
+sis.push(neuroLine);
+
+sis.push(linhaSistema('evHemoSA','Hemodinâmico',['evHemoPA','evHemoDVA','evHemoLactato','evHemoObs'],'hemodinamicamente estável, sem drogas vasoativas; ausculta cardíaca com bulhas normofonéticas, ritmo regular em 2 tempos, sem sopros'));
+
+let resp;
+const vm=checked('evRespVM');
+if(checked('evRespSA')){
+resp=vm?'Respiratório: em ventilação mecânica com bons parâmetros ventilatórios; ausculta pulmonar com murmúrio vesicular presente bilateralmente, sem ruídos adventícios; boa troca gasosa.':'Respiratório: '+gEv('eupneico','eupneica')+' em ar ambiente; ausculta pulmonar com murmúrio vesicular fisiológico, sem ruídos adventícios; boa troca gasosa.';
+}else{
+const rp=[];
+if(vm)rp.push('em ventilação mecânica');
+else if(val('evRespSuporte'))rp.push('em '+val('evRespSuporte'));
+['evRespSpo2','evRespParam','evRespGaso','evRespObs'].forEach(id=>{if(val(id))rp.push(val(id));});
+resp=rp.length?'Respiratório: '+rp.join('; ')+'.':'';
+}
+sis.push(resp);
+
+sis.push(linhaSistema('evRenalSA','Renal/metabólico',['evRenalDiurese','evRenalBalanco','evRenalLabs','evRenalGlic'],'diurese presente e adequada, sem distúrbios hidroeletrolíticos relevantes, função renal preservada'));
+sis.push(linhaSistema('evAbdSA','Abdome/ferida/drenos',['evAbdExame','evAbdFerida','evAbdDrenos','evAbdDebito'],'abdome flácido, indolor à palpação, ruídos hidroaéreos presentes; ferida operatória com curativo limpo e seco; drenos com débito habitual'));
+sis.push(linhaSistema('evInfSA','Infeccioso',['evInfTemp','evInfAtb','evInfFoco','evInfLabs'],'afebril, sem sinais clínicos de infecção em atividade'));
+const sisFiltrado=sis.filter(Boolean);
+if(sisFiltrado.length){lines.push('');lines.push('EXAME POR SISTEMAS:');sisFiltrado.forEach(s=>lines.push(s));}
+
+/* Avaliação e conduta */
+const avNeuroMap={sedo:'em sedoanalgesia contínua',vigil:gEv('vigil e orientado','vigil e orientada'),rebaixado:'com rebaixamento do nível de consciência',agitado:gEv('agitado','agitada')};
+const avHemoMap={estavel_sem:'hemodinamicamente estável, sem drogas vasoativas',estavel_com:'hemodinamicamente estável em uso de drogas vasoativas',instavel:'hemodinamicamente instável'};
+const avRespMap={vm:'em ventilação mecânica com bons parâmetros',espontanea:'em ventilação espontânea',ir:'com insuficiência respiratória'};
+const dx=val('evDx');
+const pano=[];
+if(avHemoMap[val('evAvHemo')])pano.push(avHemoMap[val('evAvHemo')]);
+if(avRespMap[val('evAvResp')])pano.push(avRespMap[val('evAvResp')]);
+if(avNeuroMap[val('evAvNeuro')])pano.push(avNeuroMap[val('evAvNeuro')]);
+if(dx||pano.length){
+lines.push('');
+let av='AVALIAÇÃO:';
+if(dx)av+=' '+dx+(/[.!?]$/.test(dx)?'':'.');
+if(pano.length)av+=' Paciente '+pano.join(', ')+'.';
+lines.push(av);
+}
+if(val('evConduta')){lines.push('');lines.push('CONDUTA: '+val('evConduta'));}
+if(val('evPendencias')){lines.push('');lines.push('PENDÊNCIAS: '+val('evPendencias'));}
+
+const dh=fmtDataHora(val('evDataHora'));
+textoEvolucao=linha+'\nEVOLUÇÃO - PÓS-OPERATÓRIO'+(dh?' - '+dh:'')+'\n'+linha+'\n\n'+lines.join('\n')+'\n\n'+linha;
+$('evResultado').textContent=textoEvolucao;
+}
+
+function copiarEvolucao(){
+if(!textoEvolucao){alert('Gere a evolução primeiro.');return}
+navigator.clipboard.writeText(textoEvolucao).then(()=>alert('Evolução copiada.')).catch(()=>alert('Erro ao copiar.'));
+}
+
+function gerarPDFEvolucao(){
+if(!textoEvolucao){alert('Gere a evolução primeiro.');return}
+if(!window.jspdf){alert('Biblioteca de PDF indisponível (sem conexão?).');return}
+const{jsPDF}=window.jspdf;
+const doc=new jsPDF();
+doc.setFont('courier');
+doc.setFontSize(10);
+const lines=doc.splitTextToSize(paraPDF(textoEvolucao),180);
+doc.text(lines,15,15);
+doc.save('evolucao-posop.pdf');
+}
+
+function novaEvolucao(){
+if(!confirm('Limpar todos os campos da evolução?'))return;
+$('tab-evolucao').querySelectorAll('input,select,textarea').forEach(el=>{
+if(el.type==='checkbox')el.checked=false;else el.value='';
+});
+document.querySelectorAll('.bundleSel').forEach(corBundle);
+evSistemas.forEach(([,det])=>show($(det)));
+const dh=$('evDataHora');const n=new Date();n.setMinutes(n.getMinutes()-n.getTimezoneOffset());dh.value=n.toISOString().slice(0,16);
+textoEvolucao='';
+$('evResultado').innerHTML='<div class="resultado-vazio">Clique em "Gerar evolução"</div>';
+}
+
+function initTabs(){
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+t.classList.add('active');
+const id=t.dataset.tab;
+$('tab-sbar').style.display=id==='sbar'?'block':'none';
+$('tab-evolucao').style.display=id==='evolucao'?'block':'none';
+}));
+}
+
 document.addEventListener('DOMContentLoaded',()=>{
 initUI();
+initEvolucao();
+initTabs();
 $('btnGerar').addEventListener('click',gerarRelatorio);
 $('btnCopiar').addEventListener('click',copiar);
 $('btnPDF').addEventListener('click',gerarPDF);
 $('btnNovo').addEventListener('click',novoCaso);
+$('evBtnGerar').addEventListener('click',gerarEvolucao);
+$('evBtnCopiar').addEventListener('click',copiarEvolucao);
+$('evBtnPDF').addEventListener('click',gerarPDFEvolucao);
+$('evBtnNovo').addEventListener('click',novaEvolucao);
 });
 </script>
 </body>
