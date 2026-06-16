@@ -89,6 +89,10 @@ select.st-nao{color:var(--muted)}
 .rep-rm{background:#fff;border:1px solid var(--line-2);color:var(--ink-2);border-radius:8px;padding:9px 13px;font-weight:700;cursor:pointer;flex:0 0 auto;line-height:1}
 .rep-rm:hover{background:#fee2e2;border-color:#fca5a5;color:#b91c1c}
 .rep-add{margin-top:12px}
+.drug-row{display:flex;align-items:center;gap:10px;padding:4px 0}
+.drug-row .checkbox-label{flex:0 0 auto;min-width:160px;border:none;padding:4px 0}
+.drug-row .checkbox-label:hover{background:none}
+.drug-row .drug-rate{flex:1;min-width:120px}
 
 </style>
 </head>
@@ -424,7 +428,7 @@ select.st-nao{color:var(--muted)}
 </div>
 <div class="grid">
 <div class="field"><label>Data/hora da avaliação</label><input id="evDataHora" type="datetime-local"/></div>
-<div class="field"><label>Tempo de pós-operatório</label><input id="evPOD" type="text" placeholder="Ex: pós-op imediato / 6h"/></div>
+<div class="field"><label>Pós-operatório</label><select id="evPOD"></select></div>
 </div>
 <div class="field"><label>Procedimento realizado</label><input id="evProc" type="text" placeholder="Ex: Laparotomia exploradora"/></div>
 </div>
@@ -477,10 +481,14 @@ select.st-nao{color:var(--muted)}
 <label class="checkbox-label"><input type="checkbox" id="evNeuroIntubado"/> Intubado em sedoanalgesia contínua</label>
 </div>
 <div id="evNeuroDet" class="grid" style="margin-top:10px">
-<div class="field"><label>RASS / sedação</label><input id="evNeuroRass" type="text" placeholder="Ex: RASS 0 / propofol"/></div>
+<div class="field"><label>RASS / sedação</label><input id="evNeuroRass" type="text" placeholder="Ex: RASS 0"/></div>
 <div class="field"><label>Glasgow / pupilas</label><input id="evNeuroGlasgow" type="text" placeholder="Ex: ECG 15, isocóricas"/></div>
 <div class="field"><label>Dor (0–10)</label><input id="evNeuroDor" type="text" placeholder="Ex: 3"/></div>
 <div class="field"><label>Observações</label><input id="evNeuroObs" type="text" placeholder="Delirium, agitação..."/></div>
+</div>
+<div id="evSedaWrap" class="subsection" style="display:none">
+<label>Drogas em sedoanalgesia contínua</label>
+<div id="evSedaList"></div>
 </div>
 </div>
 </details>
@@ -489,10 +497,15 @@ select.st-nao{color:var(--muted)}
 <summary>Hemodinâmico<span class="chev">▶</span></summary>
 <div class="section-content">
 <label class="checkbox-label" style="display:inline-flex"><input type="checkbox" id="evHemoSA"/> Sem alterações</label>
-<div id="evHemoDet" class="grid" style="margin-top:10px">
+<div id="evHemoDet" style="margin-top:10px">
+<div class="grid">
 <div class="field"><label>PA / FC / ritmo</label><input id="evHemoPA" type="text" placeholder="Ex: 120x70, FC 80, sinusal"/></div>
-<div class="field"><label>Drogas vasoativas + dose</label><input id="evHemoDVA" type="text" placeholder="Ex: noradrenalina 0,1 mcg/kg/min"/></div>
 <div class="field"><label>Lactato / perfusão</label><input id="evHemoLactato" type="text" placeholder="Ex: lactato 1,8"/></div>
+</div>
+<div class="subsection">
+<label>Drogas vasoativas</label>
+<div id="evVasoList"></div>
+</div>
 <div class="field"><label>Observações</label><input id="evHemoObs" type="text" placeholder=""/></div>
 </div>
 </div>
@@ -508,11 +521,11 @@ select.st-nao{color:var(--muted)}
 <div id="evRespDet" style="margin-top:10px">
 <div class="grid">
 <div class="field"><label>Suporte</label><select id="evRespSuporte"><option value="">Selecione</option><option>ar ambiente</option><option>O₂ suplementar</option><option>VNI</option><option>ventilação mecânica</option></select></div>
-<div class="field"><label>SpO₂ / FiO₂</label><input id="evRespSpo2" type="text" placeholder="Ex: 97% / FiO₂ 0,4"/></div>
+<div class="field"><label>Parâmetros / VM (modo, PEEP, Vc)</label><input id="evRespParam" type="text" placeholder="Ex: PSV 12, PEEP 5"/></div>
 </div>
-<div class="grid">
-<div class="field"><label>Parâmetros / VM</label><input id="evRespParam" type="text" placeholder="Ex: PSV 12, PEEP 5"/></div>
-<div class="field"><label>Gasometria</label><input id="evRespGaso" type="text" placeholder="Ex: pH 7,38 / PaO₂ 92"/></div>
+<div class="grid-3">
+<div class="field"><label>FiO₂ (%)</label><input id="evRespFiO2" type="text" inputmode="decimal" placeholder="Ex: 40"/></div>
+<div class="field"><label>SpO₂ (%)</label><input id="evRespSpo2" type="text" inputmode="decimal" placeholder="Ex: 97"/></div>
 </div>
 <input id="evRespObs" type="text" placeholder="Observações (secreção, desmame...)" style="margin-top:8px"/>
 </div>
@@ -533,11 +546,14 @@ select.st-nao{color:var(--muted)}
 </details>
 
 <details class="card" open>
-<summary>Abdome / ferida / drenos<span class="chev">▶</span></summary>
+<summary>Abdome / ferida operatória / drenos<span class="chev">▶</span></summary>
 <div class="section-content">
-<label class="checkbox-label" style="display:inline-flex"><input type="checkbox" id="evAbdSA"/> Sem alterações</label>
+<div class="checkbox-group">
+<label class="checkbox-label"><input type="checkbox" id="evAbdSA"/> Sem alterações</label>
+</div>
+<div class="field" style="margin-top:10px"><label>Sítio cirúrgico</label><select id="evAbdSitio"><option value="abdominal">Abdominal</option><option value="toracico">Torácico</option><option value="neuro">Neurológico</option><option value="outro">Outro / não cirúrgico</option></select></div>
 <div id="evAbdDet" class="grid" style="margin-top:10px">
-<div class="field"><label>Abdome / exame</label><input id="evAbdExame" type="text" placeholder="Ex: flácido, indolor, RHA+"/></div>
+<div class="field"><label>Exame do sítio / abdome</label><input id="evAbdExame" type="text" placeholder="Ex: flácido, indolor, RHA+"/></div>
 <div class="field"><label>Ferida operatória / curativo</label><input id="evAbdFerida" type="text" placeholder="Ex: curativo limpo e seco"/></div>
 <div class="field"><label>Drenos (tipo / sítio)</label><input id="evAbdDrenos" type="text" placeholder="Ex: dreno tubular em loja hepática"/></div>
 <div class="field"><label>Débito dos drenos</label><input id="evAbdDebito" type="text" placeholder="Ex: 50 mL serossanguíneo"/></div>
@@ -558,6 +574,22 @@ select.st-nao{color:var(--muted)}
 </details>
 
 <div class="block">
+<h3>Gasometria e exames</h3>
+<label class="checkbox-label" style="display:inline-flex"><input type="checkbox" id="evOmitirExames"/> Omitir resultados na evolução (mantém apenas o cálculo de P/F)</label>
+<div class="subsection" style="margin-top:10px"><label>Gasometria arterial</label>
+<div class="grid-3">
+<input id="evGasoPH" type="text" inputmode="decimal" placeholder="pH"/>
+<input id="evGasoPCO2" type="text" inputmode="decimal" placeholder="pCO₂"/>
+<input id="evGasoPO2" type="text" inputmode="decimal" placeholder="pO₂"/>
+<input id="evGasoHCO3" type="text" inputmode="decimal" placeholder="HCO₃"/>
+<input id="evGasoBE" type="text" inputmode="decimal" placeholder="BE"/>
+<input id="evGasoLac" type="text" inputmode="decimal" placeholder="Lactato"/>
+</div>
+</div>
+<div class="field" style="margin-top:10px"><label>Outros exames (Hb, plaquetas, eletrólitos, função renal...)</label><textarea id="evExamesOutros" placeholder="Ex: Hb 10,5 / plaq 180mil / Cr 1,0 / K 4,2"></textarea></div>
+</div>
+
+<div class="block">
 <h3>Avaliação e conduta</h3>
 <div class="field"><label>Diagnóstico / problemas</label><input id="evDx" type="text" placeholder="Ex: pós-operatório de gastrectomia por neoplasia"/></div>
 <div class="grid-3">
@@ -565,6 +597,7 @@ select.st-nao{color:var(--muted)}
 <div class="field"><label>Hemodinâmico (geral)</label><select id="evAvHemo"><option value="">—</option><option value="estavel_sem">Estável sem DVA</option><option value="instavel">Instável às custas de DVA</option></select></div>
 <div class="field"><label>Respiratório (geral)</label><select id="evAvResp"><option value="">—</option><option value="vm">VM com bons parâmetros</option><option value="espontanea">Ventilação espontânea</option><option value="ir">Insuficiência respiratória</option></select></div>
 </div>
+<div class="field" style="margin-top:14px"><label>Outros (avaliação)</label><input id="evAvOutros" type="text" placeholder="Ex: disfunção renal em piora, parâmetros infecciosos em elevação"/></div>
 <div class="field" style="margin-top:14px"><label>Conduta</label><textarea id="evConduta" placeholder="Condutas, ajustes, metas..."></textarea></div>
 <div class="field"><label>Pendências</label><textarea id="evPendencias" placeholder="Contato com equipe cirúrgica, exames, regulação de leito..."></textarea></div>
 <div class="actions">
@@ -975,15 +1008,17 @@ const evSistemas=[['evNeuroSA','evNeuroDet'],['evHemoSA','evHemoDet'],['evRespSA
 const evBundle=[['evBTev','profilaxia de TEV'],['evBUlcera','profilaxia de úlcera de estresse'],['evBGlic','controle glicêmico'],['evBCabeceira','cabeceira elevada (≥30°)'],['evBAnalg','analgesia prescrita com resgate'],['evBAntiem','antiemético prescrito'],['evBTemp','controle de temperatura/normotermia'],['evBAtb','antibiótico em dia / repique'],['evBBalanco','balanço / reposição volêmica'],['evBDieta','dieta definida'],['evBOcular','cuidados oculares / sedação se IOT']];
 
 const DISP_FIELDS=[
-{f:'tipo',type:'select',options:[{v:'',l:'Tipo'},'AVP','CVC','PICC','PAI','Sonda vesical (SVD)','SNG/SOG','Tubo orotraqueal','Traqueostomia','Dreno','Cateter peridural','Outro']},
+{f:'tipo',type:'select',options:[{v:'',l:'Tipo'},'AVP','CVC','PICC','PAI','Sonda vesical (SVD)','SNG/SOG','Tubo orotraqueal','Traqueostomia','Dreno','DVE','Cateter de PIC','Cateter peridural','Outro']},
 {f:'sitio',type:'text',placeholder:'sítio / observação'},
 {f:'data',type:'date',lbl:'Inserção'},
+{f:'fim',type:'date',lbl:'Retirada'},
 {f:'emuso',type:'checkbox',label:'em uso'}
 ];
 const ATB_FIELDS=[
 {f:'nome',type:'text',placeholder:'Antibiótico'},
 {f:'inicio',type:'date',lbl:'Início'},
 {f:'fim',type:'date',lbl:'Fim'},
+{f:'previsao',type:'text',lbl:'Previsão (dias)'},
 {f:'emuso',type:'checkbox',label:'em uso'}
 ];
 const CULT_FIELDS=[
@@ -991,6 +1026,28 @@ const CULT_FIELDS=[
 {f:'data',type:'date',lbl:'Coleta'},
 {f:'status',type:'text',placeholder:'status / obs (ex: aguardando resultado)'}
 ];
+const SEDA_DRUGS=['Propofol','Fentanil','Midazolam','Dexmedetomidina','Remifentanil','Cetamina','Morfina'];
+const VASO_DRUGS=['Noradrenalina','Vasopressina','Adrenalina','Dobutamina','Dopamina','Nitroglicerina','Nitroprussiato'];
+const RATE_UNITS=['mL/h','mcg/kg/min','mcg/kg/h','mg/kg/h','mcg/min','mg/h','UI/h','U/min'];
+
+function buildDrugGroup(containerId,drugs,defUnit){
+const c=$(containerId);
+drugs.forEach(d=>{
+const row=document.createElement('div');row.className='drug-row';
+const lab=document.createElement('label');lab.className='checkbox-label';
+const cb=document.createElement('input');cb.type='checkbox';cb.dataset.nome=d;
+lab.appendChild(cb);lab.appendChild(document.createTextNode(' '+d));
+const rate=document.createElement('input');rate.type='text';rate.inputMode='decimal';rate.placeholder='vazão';rate.className='drug-rate';
+const unit=document.createElement('select');unit.className='drug-unit';
+RATE_UNITS.forEach(u=>{const o=document.createElement('option');o.value=u;o.textContent=u;if(u===defUnit)o.selected=true;unit.appendChild(o);});
+row.appendChild(lab);row.appendChild(rate);row.appendChild(unit);
+c.appendChild(row);
+});
+}
+function readDrugs(containerId){
+return Array.from($(containerId).querySelectorAll('.drug-row')).filter(r=>r.querySelector('input[type=checkbox]').checked).map(r=>({nome:r.querySelector('input[type=checkbox]').dataset.nome,rate:r.querySelector('.drug-rate').value.trim(),unit:r.querySelector('.drug-unit').value}));
+}
+function fmtDrugs(list){return list.map(d=>d.nome.toLowerCase()+(d.rate?' '+d.rate+' '+d.unit:'')).join(', ');}
 
 function makeField(f){
 let el;
@@ -1045,28 +1102,21 @@ $('evAddCult').addEventListener('click',()=>addRow('evCultList',CULT_FIELDS));
 addRow('evDispList',DISP_FIELDS);
 addRow('evAtbList',ATB_FIELDS);
 addRow('evCultList',CULT_FIELDS);
+buildDrugGroup('evSedaList',SEDA_DRUGS,'mL/h');
+buildDrugGroup('evVasoList',VASO_DRUGS,'mcg/kg/min');
+const po=$('evPOD');
+po.innerHTML='';
+[['','—'],['poi','PO imediato']].concat(Array.from({length:20},(_,i)=>[String(i+1),(i+1)+'º PO'])).forEach(([v,l])=>{const o=document.createElement('option');o.value=v;o.textContent=l;po.appendChild(o);});
+$('evNeuroIntubado').addEventListener('change',e=>e.target.checked?show($('evSedaWrap')):hide($('evSedaWrap')));
 const dh=$('evDataHora');
 if(dh&&!dh.value){const n=new Date();n.setMinutes(n.getMinutes()-n.getTimezoneOffset());dh.value=n.toISOString().slice(0,16);}
 }
 
-const SIS_HEMO=[
-{id:'evHemoPA',normal:'PA e FC estáveis, ritmo sinusal'},
-{id:'evHemoDVA',normal:'sem drogas vasoativas',fmt:v=>'em uso de '+v},
-{normal:'ausculta cardíaca com bulhas normofonéticas, ritmo regular em 2 tempos, sem sopros'},
-{id:'evHemoLactato',fmt:v=>/lact/i.test(v)?v:'lactato '+v},
-{id:'evHemoObs',fmt:v=>v}
-];
 const SIS_RENAL=[
 {id:'evRenalDiurese',normal:'diurese presente e adequada',fmt:v=>/diur|olig|an[úu]r/i.test(v)?v:'diurese '+v},
 {id:'evRenalBalanco',fmt:v=>/balan/i.test(v)?v:'balanço '+v},
 {id:'evRenalLabs',normal:'função renal e eletrólitos sem alterações relevantes'},
 {id:'evRenalGlic',normal:'glicemia controlada',fmt:v=>/glic/i.test(v)?v:'glicemia '+v}
-];
-const SIS_ABD=[
-{id:'evAbdExame',normal:'abdome flácido, indolor à palpação, ruídos hidroaéreos presentes'},
-{id:'evAbdFerida',normal:'ferida operatória com curativo limpo e seco'},
-{id:'evAbdDrenos',fmt:v=>v},
-{id:'evAbdDebito',fmt:v=>/d[ée]bito/i.test(v)?v:'débito de drenos: '+v}
 ];
 const SIS_INF=[
 {id:'evInfTemp',normal:'afebril'},
@@ -1091,6 +1141,8 @@ const intub=checked('evNeuroIntubado');
 const ignore=checked('evNeuroSA');
 if(intub){
 let s='Neurológico: RASS -5, em sedoanalgesia contínua';
+const seda=fmtDrugs(readDrugs('evSedaList'));
+if(seda)s+=' ('+seda+')';
 const obs=ignore?'':val('evNeuroObs');
 if(obs)s+='; '+obs;
 return s+'.';
@@ -1103,6 +1155,27 @@ return renderSistema('Neurológico','evNeuroSA',[
 ]);
 }
 
+function renderHemo(){
+const ignore=checked('evHemoSA');
+const g2=id=>ignore?'':val(id);
+const vaso=ignore?[]:readDrugs('evVasoList');
+const out=[];
+out.push(g2('evHemoPA')||'PA e FC estáveis, ritmo sinusal');
+out.push(vaso.length?'em uso de '+fmtDrugs(vaso):'sem drogas vasoativas');
+out.push('ausculta cardíaca com bulhas normofonéticas, ritmo regular em 2 tempos, sem sopros');
+const lac=g2('evHemoLactato');if(lac)out.push(/lact/i.test(lac)?lac:'lactato '+lac);
+const obs=g2('evHemoObs');if(obs)out.push(obs);
+return 'Hemodinâmico: '+out.filter(Boolean).join('; ')+'.';
+}
+
+function num(v){if(!v)return null;const n=parseFloat(String(v).replace(',','.'));return isNaN(n)?null:n;}
+function fio2Frac(vm){
+const raw=val('evRespFiO2');
+if(raw){const n=num(raw);if(n!=null)return n>1?n/100:n;}
+const sup=val('evRespSuporte');
+if(!vm&&(sup===''||sup==='ar ambiente'))return 0.21;
+return null;
+}
 function renderResp(){
 const vm=checked('evRespVM');
 const ignore=checked('evRespSA');
@@ -1110,12 +1183,34 @@ const g2=id=>ignore?'':val(id);
 const out=[];
 if(vm)out.push('em ventilação mecânica com bons parâmetros ventilatórios');
 else out.push(g2('evRespSuporte')?'em '+g2('evRespSuporte'):gEv('eupneico','eupneica')+' em ar ambiente');
-out.push(g2('evRespSpo2')||'saturação adequada');
+const spo2=g2('evRespSpo2');
+out.push(spo2?'SpO₂ '+spo2+(/%/.test(spo2)?'':'%'):'saturação adequada');
 out.push('ausculta pulmonar com murmúrio vesicular '+(vm?'presente bilateralmente':'fisiológico')+', sem ruídos adventícios');
 if(g2('evRespParam'))out.push(g2('evRespParam'));
-out.push(g2('evRespGaso')||'boa troca gasosa');
+const po2=num(val('evGasoPO2'));
+const ff=fio2Frac(vm);
+if(po2!=null&&ff)out.push('relação P/F '+Math.round(po2/ff));
+else out.push('boa troca gasosa');
 if(g2('evRespObs'))out.push(g2('evRespObs'));
 return 'Respiratório: '+out.filter(Boolean).join('; ')+'.';
+}
+
+function renderAbd(){
+const ignore=checked('evAbdSA');
+const site=val('evAbdSitio')||'abdominal';
+const g2=id=>ignore?'':val(id);
+const out=[];
+const exame=g2('evAbdExame');
+if(exame)out.push(exame);
+else if(site==='abdominal')out.push('abdome flácido, indolor à palpação, ruídos hidroaéreos presentes');
+else if(site==='toracico')out.push('tórax sem alterações, expansibilidade simétrica');
+const ferida=g2('evAbdFerida');
+if(ferida)out.push(ferida);
+else{const fmap={abdominal:'ferida operatória com curativo limpo e seco',toracico:'ferida operatória torácica com curativo limpo e seco',neuro:'ferida operatória craniana com curativo limpo e seco, sem sinais flogísticos',outro:'ferida operatória com curativo limpo e seco'};out.push(fmap[site]||'ferida operatória com curativo limpo e seco');}
+const dren=g2('evAbdDrenos');if(dren)out.push(dren);
+const deb=g2('evAbdDebito');if(deb)out.push(/d[ée]bito/i.test(deb)?deb:'débito de drenos: '+deb);
+const nome=site==='abdominal'?'Abdome/ferida/drenos':(site==='toracico'?'Tórax/ferida/drenos':'Ferida operatória/drenos');
+return out.length?nome+': '+out.join('; ')+'.':'';
 }
 
 function gerarEvolucao(){
@@ -1127,8 +1222,9 @@ const ident=[val('evNome')||'Paciente'];
 if(val('evIdade'))ident.push(val('evIdade')+' anos');
 if(val('evSexo'))ident.push('sexo '+val('evSexo'));
 let cab=ident.join(', ')+'.';
-if(val('evProc'))cab+=' '+gEv('Submetido','Submetida')+' a '+val('evProc').toLowerCase()+'.';
-if(val('evPOD')){const p=val('evPOD');cab+=' '+p.charAt(0).toUpperCase()+p.slice(1)+'.';}
+if(val('evProc'))cab+=' '+gEv('Submetido','Submetida')+' a '+val('evProc')+'.';
+const podv=val('evPOD');
+if(podv){const t=podv==='poi'?'pós-operatório imediato':podv+'º dia de pós-operatório';cab+=' '+t.charAt(0).toUpperCase()+t.slice(1)+'.';}
 lines.push(cab);
 
 /* Situação de leito */
@@ -1143,9 +1239,10 @@ lines.push('');lines.push('DISPOSITIVOS:');
 disp.forEach(r=>{
 let s='  - '+(r.tipo||'dispositivo');
 if(r.sitio)s+=' ('+r.sitio+')';
+const ini=r.data?fmtData(r.data):'';
 const dd=r.data?diasDesde(r.data):null;
-const dn=(dd!=null&&dd>=0)?'D'+(dd+1):'';
-if(r.data){s+=': inserido em '+fmtData(r.data);const ex=[dn,r.emuso?'em uso':''].filter(Boolean);if(ex.length)s+=' ('+ex.join(', ')+')';}
+const dn=(r.emuso&&dd!=null&&dd>=0)?' (D'+(dd+1)+')':'';
+if(ini){const fim=r.fim?fmtData(r.fim):(r.emuso?'atual':'');s+=': '+ini+(fim?'–'+fim:'')+dn;}
 else if(r.emuso)s+=': em uso';
 lines.push(s);
 });
@@ -1158,9 +1255,11 @@ lines.push('');lines.push('ANTIBIÓTICOS:');
 atb.forEach(r=>{
 let s='  - '+r.nome;
 const ini=r.inicio?fmtData(r.inicio):'';
-if(r.emuso){const dd=r.inicio?diasDesde(r.inicio):null;const dn=(dd!=null&&dd>=0)?'D'+(dd+1):'';const meta=[ini?'início '+ini:'',dn,'em uso'].filter(Boolean);s+=' ('+meta.join(', ')+')';}
-else if(r.fim)s+=' ('+(ini||'?')+' a '+fmtData(r.fim)+')';
-else if(ini)s+=' (início '+ini+')';
+const dd=r.inicio?diasDesde(r.inicio):null;
+const dstr=(dd!=null&&dd>=0)?' (D'+(dd+1)+(r.previsao?'/'+r.previsao:'')+')':'';
+if(r.emuso)s+=': '+(ini||'?')+'–atual'+dstr;
+else if(r.fim)s+=': '+(ini||'?')+'–'+fmtData(r.fim);
+else if(ini)s+=': '+ini+dstr;
 lines.push(s);
 });
 }
@@ -1189,26 +1288,41 @@ if(naoind.length)lines.push('  Não indicado: '+naoind.join(', ')+'.');
 }
 
 /* Revisão por sistemas (campo vazio = normal) */
-const sis=[renderNeuro(),renderSistema('Hemodinâmico','evHemoSA',SIS_HEMO),renderResp(),renderSistema('Renal/metabólico','evRenalSA',SIS_RENAL),renderSistema('Abdome/ferida/drenos','evAbdSA',SIS_ABD),renderSistema('Infeccioso','evInfSA',SIS_INF)];
+const sis=[renderNeuro(),renderHemo(),renderResp(),renderSistema('Renal/metabólico','evRenalSA',SIS_RENAL),renderAbd(),renderSistema('Infeccioso','evInfSA',SIS_INF)];
 const sisFiltrado=sis.filter(Boolean);
 if(sisFiltrado.length){lines.push('');lines.push('EXAME POR SISTEMAS:');sisFiltrado.forEach(s=>lines.push(s));}
+
+/* Gasometria e exames (transcrição opcional) */
+if(!checked('evOmitirExames')){
+const gp=[];
+const addg=(rot,id)=>{const v=val(id);if(v)gp.push(rot+' '+v);};
+addg('pH','evGasoPH');addg('pCO₂','evGasoPCO2');addg('pO₂','evGasoPO2');addg('HCO₃','evGasoHCO3');addg('BE','evGasoBE');addg('lactato','evGasoLac');
+const ex=[];
+if(gp.length)ex.push('Gasometria arterial: '+gp.join(', ')+'.');
+if(val('evExamesOutros'))ex.push(val('evExamesOutros'));
+if(ex.length){lines.push('');lines.push('EXAMES:');ex.forEach(e=>lines.push(e));}
+}
 
 /* Avaliação e conduta */
 const avNeuroMap={sedo:'em sedoanalgesia contínua',vigil:gEv('vigil e orientado','vigil e orientada'),rebaixado:'com rebaixamento do nível de consciência',agitado:gEv('agitado','agitada')};
 const avHemoMap={estavel_sem:'hemodinamicamente estável, sem drogas vasoativas',instavel:'hemodinamicamente instável às custas de drogas vasoativas'};
 const avRespMap={vm:'em ventilação mecânica com bons parâmetros',espontanea:'em ventilação espontânea',ir:'com insuficiência respiratória'};
 const dx=val('evDx');
+let hemoKey=val('evAvHemo');
+if(!hemoKey&&readDrugs('evVasoList').length)hemoKey='instavel';
 const pano=[];
-if(avHemoMap[val('evAvHemo')])pano.push(avHemoMap[val('evAvHemo')]);
+if(avHemoMap[hemoKey])pano.push(avHemoMap[hemoKey]);
 if(avRespMap[val('evAvResp')])pano.push(avRespMap[val('evAvResp')]);
 if(avNeuroMap[val('evAvNeuro')])pano.push(avNeuroMap[val('evAvNeuro')]);
-if(dx||pano.length){
+const outros=val('evAvOutros');
+if(dx||pano.length||outros){
 lines.push('');
 lines.push('AVALIAÇÃO:'+(dx?' '+dx+(/[.!?]$/.test(dx)?'':'.'):''));
 if(pano.length){
 pano[0]='Paciente '+pano[0];
 pano.forEach((p,i)=>lines.push(p+(i===pano.length-1?'.':'')));
 }
+if(outros)lines.push(outros.charAt(0).toUpperCase()+outros.slice(1)+(/[.!?]$/.test(outros)?'':'.'));
 }
 if(val('evConduta')){lines.push('');lines.push('CONDUTA: '+val('evConduta'));}
 if(val('evPendencias')){lines.push('');lines.push('PENDÊNCIAS: '+val('evPendencias'));}
@@ -1242,6 +1356,7 @@ if(el.type==='checkbox')el.checked=false;else el.value='';
 });
 document.querySelectorAll('.bundleSel').forEach(corBundle);
 evSistemas.forEach(([,det])=>show($(det)));
+hide($('evSedaWrap'));
 $('evDispList').innerHTML='';$('evAtbList').innerHTML='';$('evCultList').innerHTML='';
 addRow('evDispList',DISP_FIELDS);addRow('evAtbList',ATB_FIELDS);addRow('evCultList',CULT_FIELDS);
 const dh=$('evDataHora');const n=new Date();n.setMinutes(n.getMinutes()-n.getTimezoneOffset());dh.value=n.toISOString().slice(0,16);
